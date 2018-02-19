@@ -1,13 +1,16 @@
+'scopeName': 'source.puppet'
 'fileTypes': [
   'pp'
 ]
 'foldingStartMarker': '(^\\s*/\\*|(\\{|\\[|\\()\\s*$)'
 'foldingStopMarker': '(\\*/|^\\s*(\\}|\\]|\\)))'
-'keyEquivalent': '^~P'
 'name': 'Puppet'
 'patterns': [
   {
     'include': '#line_comment'
+  }
+  {
+    'include': '#constants'
   }
   {
     'begin': '^\\s*/\\*'
@@ -15,9 +18,7 @@
     'name': 'comment.block.puppet'
   }
   {
-    'begin': '(?x)^\\s*
-          (node|class)\\s+
-          ((?:[-_A-Za-z0-9".]+::)*[-_A-Za-z0-9".]+)\\s* # identifier'
+    'begin': '^\\s*(node|class)\\s+((?:[-_A-Za-z0-9"\'.]+::)*[-_A-Za-z0-9"\'.]+)\\s*'
     'captures':
       '1':
         'name': 'storage.type.puppet'
@@ -26,18 +27,6 @@
     'end': '(?={)'
     'name': 'meta.definition.class.puppet'
     'patterns': [
-      {
-        'include': '#variables'
-      }
-      {
-        'include': '#constants'
-      }
-      {
-        'include': '#strings'
-      }
-      {
-        'include': '#numbers'
-      }
       {
         'begin': '\\b(inherits)\\b\\s+'
         'captures':
@@ -52,10 +41,69 @@
           }
         ]
       }
+      {
+        'include': '#line_comment'
+      }
+      {
+        'captures':
+          '1':
+            'name': 'variable.other.puppet'
+          '2':
+            'name': 'punctuation.definition.variable.puppet'
+        'match': '((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=,|\\))'
+        'name': 'meta.function.argument.no-default.untyped.puppet'
+      }
+      {
+        'captures':
+          '1':
+            'name': 'storage.type.puppet'
+          '2':
+            'name': 'variable.other.puppet'
+          '3':
+            'name': 'punctuation.definition.variable.puppet'
+        'match': '((?:[-_A-Za-z0-9"\'.]+::)*[-_A-Za-z0-9"\'.]+)\\s((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=,|\\))'
+        'name': 'meta.function.argument.no-default.typed.puppet'
+      }
+      {
+        'begin': '((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*(=)\\s*)\\s*'
+        'captures':
+          '1':
+            'name': 'variable.other.puppet'
+          '2':
+            'name': 'punctuation.definition.variable.puppet'
+          '3':
+            'name': 'keyword.operator.assignment.puppet'
+        'end': '(?=,|\\))'
+        'name': 'meta.function.argument.default.untyped.puppet'
+        'patterns': [
+          {
+            'include': '#parameter-default-types'
+          }
+        ]
+      }
+      {
+        'begin': '((?:[-_A-Za-z0-9"\'.]+::)*[-_A-Za-z0-9"\'.]+)\\s((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*(=)\\s*)\\s*'
+        'captures':
+          '1':
+            'name': 'storage.type.puppet'
+          '2':
+            'name': 'variable.other.puppet'
+          '3':
+            'name': 'punctuation.definition.variable.puppet'
+          '4':
+            'name': 'keyword.operator.assignment.puppet'
+        'end': '(?=,|\\))'
+        'name': 'meta.function.argument.default.typed.puppet'
+        'patterns': [
+          {
+            'include': '#parameter-default-types'
+          }
+        ]
+      }
     ]
   }
   {
-    'begin': '^\\s*(define)\\s+([a-zA-Z0-9_:]+)\\s*(\\()'
+    'begin': '^\\s*(define|function)\\s+([a-zA-Z0-9_:]+)\\s*(\\()'
     'beginCaptures':
       '1':
         'name': 'storage.type.function.puppet'
@@ -76,11 +124,11 @@
             'name': 'variable.other.puppet'
           '2':
             'name': 'punctuation.definition.variable.puppet'
-        'match': '((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)\\s*(?=,|\\))'
+        'match': '((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=,|\\))'
         'name': 'meta.function.argument.no-default.puppet'
       }
       {
-        'begin': '((\\$+)[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*)(?:\\s*(=)\\s*)\\s*'
+        'begin': '((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*(=)\\s*)\\s*'
         'captures':
           '1':
             'name': 'variable.other.puppet'
@@ -104,28 +152,34 @@
         'name': 'storage.type.puppet'
       '2':
         'name': 'entity.name.section.puppet'
-    'match': '^\\s*(\\S+)\\s*{\\s*([\'"].+[\'"]):'
+    'match': '^\\s*(\\w+)\\s*{\\s*([\'"].+[\'"]):'
     'name': 'meta.definition.resource.puppet'
   }
   {
-    'match': '\\b(case|if|unless|else|elsif)(?!::)'
+    'match': '^\\s*(\\w+)\\s*{\\s*(\\$[a-zA-Z_]+)\\s*:'
+    'captures':
+      '1':
+        'name': 'storage.type.puppet'
+      '2':
+        'name': 'entity.name.section.puppet'
+    'name': 'meta.definition.resource.puppet'
+  }
+  {
+    'match': '\\b(case|if|else|elsif|unless)(?!::)\\b'
     'name': 'keyword.control.puppet'
+  }
+  {
+    'include': '#strings'
   }
   {
     'match': '((\\$?)"?[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*"?):(?=\\s+|$)'
     'name': 'entity.name.section.puppet'
   }
   {
-    'include': '#strings'
-  }
-  {
     'include': '#variable'
   }
   {
-    'include': '#constants'
-  }
-  {
-    'begin': '(?i)\\b(import|include)\\b\\s*'
+    'begin': '\\b(import|include|contain|require)\\s+(?!.*=>)'
     'beginCaptures':
       '1':
         'name': 'keyword.control.import.include.puppet'
@@ -141,15 +195,19 @@
     'name': 'constant.other.bareword.puppet'
   }
   {
-    'match': '\\b(escape|gsub|alert|crit|debug|notice|defined|emerg|err|failed|file|generate|include|info|realize|search|tag|tagged|template|warning)\\b'
+    'match': '\\b(alert|crit|debug|defined|emerg|err|escape|fail|failed|file|generate|gsub|info|notice|package|realize|search|tag|tagged|template|warning)\\b(?!.*{)'
     'name': 'support.function.puppet'
+  }
+  {
+    'match': '=>'
+    'name': 'punctuation.separator.key-value.puppet'
   }
 ]
 'repository': 
   'constants':
     'patterns': [
       {
-        'match': '(?i)\\b(false|true|running|undef|present|absent|file|directory)\\b'
+        'match': '\\b(absent|directory|false|file|present|running|stopped|true)\\b(?!.*{)'
         'name': 'constant.language.puppet'
       }
     ]
@@ -298,27 +356,50 @@
         'include': '#variables'
       }
       {
-        'match': '='
-        'name': 'keyword.operator.assignment.php'
+        'include': '#hash'
       }
       {
-        'begin': '(\\[)'
-        'beginCaptures':
-          '1':
-            'name': 'punctuation.definition.array.begin.puppet'
-        'end': '\\]'
-        'endCaptures':
-          '0':
-            'name': 'punctuation.definition.array.end.puppet'
-        'name': 'meta.array.php'
-        'patterns': [
-          {
-            'include': '#parameter-default-types'
-          }
-        ]
+        'include': '#array'
+      }
+      {
+        'include': '#function_call'
       }
       {
         'include': '#constants'
+      }
+    ]
+  'array':
+    'begin': '(\\[)'
+    'beginCaptures':
+      '1':
+        'name': 'punctuation.definition.array.begin.puppet'
+    'end': '\\]'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.array.end.puppet'
+    'name': 'meta.array.puppet'
+    'patterns': [
+      {
+        'include': '#parameter-default-types'
+      }
+    ]
+  'hash':
+    'begin': '\\{'
+    'beginCaptures':
+      '0':
+        'name': 'punctuation.definition.hash.begin.puppet'
+    'end': '\\}'
+    'endCaptures':
+      '0':
+        'name': 'punctuation.definition.hash.end.puppet'
+    'name': 'meta.hash.puppet'
+    'patterns': [
+      {
+        'match': '\\b\\w+\\s*(?==>)\\s*'
+        'name': 'constant.other.key.puppet'
+      }
+      {
+        'include': '#parameter-default-types'
       }
     ]
   'single-quoted-string':
@@ -351,7 +432,7 @@
         'captures':
           '1':
             'name': 'punctuation.definition.variable.puppet'
-        'match': '(\\$)([a-zA-Zx7f-xff\\$]|::)([a-zA-Z0-9_x7f-xff\\$]|::)*\\b'
+        'match': '(\\$)((::)?[a-z]\\w*)*((::)?[a-z_]\\w*)\\b'
         'name': 'variable.other.readwrite.global.puppet'
       }
       {
@@ -364,5 +445,16 @@
         'name': 'variable.other.readwrite.global.puppet'
       }
     ]
-'scopeName': 'source.puppet'
-'uuid': 'AAF4E089-E3C9-4FB9-B099-FD2CCBD4E786'
+  'function_call':
+    'begin': '([a-zA-Z_][a-zA-Z0-9_]*)(\\()'
+    'end': '\\)'
+    'name': 'meta.function-call.puppet'
+    'patterns': [
+      {
+        'include': '#parameter-default-types'
+      }
+      {
+        'match': ','
+        'name': 'punctuation.separator.parameters.puppet'
+      }
+    ]
