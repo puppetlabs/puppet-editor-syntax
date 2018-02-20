@@ -176,6 +176,9 @@ patterns: [
     name: "entity.name.section.puppet"
   }
   {
+    include: "#numbers"
+  }
+  {
     include: "#variable"
   }
   {
@@ -424,6 +427,24 @@ repository:
       }
       {
         include: "#single-quoted-string"
+      }
+    ]
+  numbers:
+    patterns: [
+      {
+        comment: "HEX 0x 0-f"
+        match: "(?<!\\w|\\d)([-+]?)(?i:0x)(?i:[0-9a-f])+(?!\\w|\\d)"
+        name: "constant.numeric.hexadecimal.puppet"
+      }
+      {
+        comment: "INTEGERS [(+|-)] digits [e [(+|-)] digits]"
+        match: "(?<!\\w|\\.)([-+]?)(?<!\\d)\\d+(?i:e(\\+|-){0,1}\\d+){0,1}(?!\\w|\\d|\\.)"
+        name: "constant.numeric.integer.puppet"
+      }
+      {
+        comment: "FLOAT [(+|-)] digits . digits [e [(+|-)] digits]"
+        match: "(?<!\\w)([-+]?)\\d+\\.\\d+(?i:e(\\+|-){0,1}\\d+){0,1}(?!\\w|\\d)"
+        name: "constant.numeric.integer.puppet"
       }
     ]
   variable:

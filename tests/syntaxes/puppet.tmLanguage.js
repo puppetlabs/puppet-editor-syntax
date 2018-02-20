@@ -38,6 +38,87 @@ describe('puppet.tmLanguage', function() {
   });
 
 
+  describe('numbers', function() {
+    var hexTestCases = ['0xff', '0xabcdef0123456789', '0x0']
+    var integerTestCases = ['10', '0', '-9', '10000']
+    var octalTestCases = ['077', '01234567', '00']
+    var floatingPointTestCases = ['+1.0e2', '-1.0e-2', '1.0', '1.0e0']
+    var notANumberTestCases = ['abc', '0xg123', '.1', '+1.0eas']
+
+    var contexts = {
+      'variable assignment': { 'manifest': "$var = ##TESTCASE##", 'expectedTokenIndex': 3 },
+      'beginning of array': { 'manifest': "$var = [##TESTCASE##, 'abc']", 'expectedTokenIndex': 3 },
+      'end of array': { 'manifest': "$var = ['abc', ##TESTCASE##]", 'expectedTokenIndex': 7 },
+      'middle of array': { 'manifest': "$var = ['abc', ##TESTCASE##, 1.0]", 'expectedTokenIndex': 7 },
+      'hash value': { 'manifest': "$var = { 'abc' => ##TESTCASE##}", 'expectedTokenIndex': 9 }
+    }
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        describe('hex', function() {
+          hexTestCases.forEach(function(testCase){
+            it(testCase, function() {
+              var manifest = contexts[contextName]['manifest'].replace('##TESTCASE##', testCase)
+              var tokenIndex = contexts[contextName]['expectedTokenIndex']
+              var tokens = getLineTokens(grammar, manifest);
+              expect(tokens[tokenIndex]).to.eql({value: testCase, scopes: ['source.puppet', 'constant.numeric.hexadecimal.puppet']});
+            });
+          });
+        });
+
+        describe('integer', function() {
+          integerTestCases.forEach(function(testCase){
+            it(testCase, function() {
+              var manifest = contexts[contextName]['manifest'].replace('##TESTCASE##', testCase)
+              var tokenIndex = contexts[contextName]['expectedTokenIndex']
+              var tokens = getLineTokens(grammar, manifest);
+              expect(tokens[tokenIndex]).to.eql({value: testCase, scopes: ['source.puppet', 'constant.numeric.integer.puppet']});
+            });
+          });
+        });
+
+        describe('octal', function() {
+          octalTestCases.forEach(function(testCase){
+            it(testCase, function() {
+              var manifest = contexts[contextName]['manifest'].replace('##TESTCASE##', testCase)
+              var tokenIndex = contexts[contextName]['expectedTokenIndex']
+              var tokens = getLineTokens(grammar, manifest);
+              expect(tokens[tokenIndex]).to.eql({value: testCase, scopes: ['source.puppet', 'constant.numeric.integer.puppet']});
+            });
+          });
+        });
+
+        describe('floating point', function() {
+          floatingPointTestCases.forEach(function(testCase){
+            it(testCase, function() {
+              var manifest = contexts[contextName]['manifest'].replace('##TESTCASE##', testCase)
+              var tokenIndex = contexts[contextName]['expectedTokenIndex']
+              var tokens = getLineTokens(grammar, manifest);
+              expect(tokens[tokenIndex]).to.eql({value: testCase, scopes: ['source.puppet', 'constant.numeric.integer.puppet']});
+            });
+          });
+        });
+
+        describe('not a number', function() {
+          notANumberTestCases.forEach(function(testCase){
+            it(testCase, function() {
+              var manifest = contexts[contextName]['manifest'].replace('##TESTCASE##', testCase)
+              var tokenIndex = contexts[contextName]['expectedTokenIndex']
+              var tokens = getLineTokens(grammar, manifest);
+              // Not a big fan of this, but don't know how to express "undefined OR not equal to..."
+              if (tokens[tokenIndex] == undefined) {
+                expect(tokens[tokenIndex]).to.be(undefined)
+              } else {
+                expect(tokens[tokenIndex]).to.not.be({value: testCase, scopes: ['source.puppet', 'constant.numeric.hexadecimal.puppet']});
+                expect(tokens[tokenIndex]).to.not.be({value: testCase, scopes: ['source.puppet', 'constant.numeric.integer.puppet']});
+              }
+            });
+          });
+        });
+      });
+    };
+  });
+
+
   describe('blocks', function() {
     it("tokenizes single quoted node", function() {
       var tokens = getLineTokens(grammar, "node 'hostname' {")
