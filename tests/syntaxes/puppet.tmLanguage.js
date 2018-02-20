@@ -119,6 +119,14 @@ describe('puppet.tmLanguage', function() {
   });
 
 
+  describe('puppet tasks and plans', function() {
+    it("tokenizes plan keyword", function() {
+      var tokens = getLineTokens(grammar, "plan mymodule::my_plan() {}")
+      expect(tokens[0]).to.eql({value: 'plan', scopes: ['source.puppet', 'meta.definition.plan.puppet', 'storage.type.puppet']});
+    });
+  });
+
+
   describe('blocks', function() {
     it("tokenizes single quoted node", function() {
       var tokens = getLineTokens(grammar, "node 'hostname' {")
