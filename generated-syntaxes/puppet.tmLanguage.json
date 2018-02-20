@@ -60,22 +60,7 @@
             }
           },
           "match": "((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=,|\\))",
-          "name": "meta.function.argument.no-default.untyped.puppet"
-        },
-        {
-          "captures": {
-            "1": {
-              "name": "storage.type.puppet"
-            },
-            "2": {
-              "name": "variable.other.puppet"
-            },
-            "3": {
-              "name": "punctuation.definition.variable.puppet"
-            }
-          },
-          "match": "((?:[-_A-Za-z0-9\"\\'.]+::)*[-_A-Za-z0-9\"\\'.]+)\\s((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=,|\\))",
-          "name": "meta.function.argument.no-default.typed.puppet"
+          "name": "meta.function.argument.puppet"
         },
         {
           "begin": "((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*(=)\\s*)\\s*",
@@ -91,7 +76,7 @@
             }
           },
           "end": "(?=,|\\))",
-          "name": "meta.function.argument.default.untyped.puppet",
+          "name": "meta.function.argument.puppet",
           "patterns": [
             {
               "include": "#parameter-default-types"
@@ -99,28 +84,7 @@
           ]
         },
         {
-          "begin": "((?:[-_A-Za-z0-9\"\\'.]+::)*[-_A-Za-z0-9\"\\'.]+)\\s((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*(=)\\s*)\\s*",
-          "captures": {
-            "1": {
-              "name": "storage.type.puppet"
-            },
-            "2": {
-              "name": "variable.other.puppet"
-            },
-            "3": {
-              "name": "punctuation.definition.variable.puppet"
-            },
-            "4": {
-              "name": "keyword.operator.assignment.puppet"
-            }
-          },
-          "end": "(?=,|\\))",
-          "name": "meta.function.argument.default.typed.puppet",
-          "patterns": [
-            {
-              "include": "#parameter-default-types"
-            }
-          ]
+          "include": "#parameter-default-types"
         }
       ]
     },
@@ -150,22 +114,7 @@
             }
           },
           "match": "((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=,|\\))",
-          "name": "meta.function.argument.no-default.untyped.puppet"
-        },
-        {
-          "captures": {
-            "1": {
-              "name": "storage.type.puppet"
-            },
-            "2": {
-              "name": "variable.other.puppet"
-            },
-            "3": {
-              "name": "punctuation.definition.variable.puppet"
-            }
-          },
-          "match": "((?:[-_A-Za-z0-9\"\\'.]+::)*[-_A-Za-z0-9\"\\'.]+)\\s((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=,|\\))",
-          "name": "meta.function.argument.no-default.typed.puppet"
+          "name": "meta.function.argument.puppet"
         },
         {
           "begin": "((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*(=)\\s*)\\s*",
@@ -181,7 +130,7 @@
             }
           },
           "end": "(?=,|\\))",
-          "name": "meta.function.argument.default.untyped.puppet",
+          "name": "meta.function.argument.puppet",
           "patterns": [
             {
               "include": "#parameter-default-types"
@@ -189,28 +138,7 @@
           ]
         },
         {
-          "begin": "((?:[-_A-Za-z0-9\"\\'.]+::)*[-_A-Za-z0-9\"\\'.]+)\\s((\\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\\s*(=)\\s*)\\s*",
-          "captures": {
-            "1": {
-              "name": "storage.type.puppet"
-            },
-            "2": {
-              "name": "variable.other.puppet"
-            },
-            "3": {
-              "name": "punctuation.definition.variable.puppet"
-            },
-            "4": {
-              "name": "keyword.operator.assignment.puppet"
-            }
-          },
-          "end": "(?=,|\\))",
-          "name": "meta.function.argument.default.typed.puppet",
-          "patterns": [
-            {
-              "include": "#parameter-default-types"
-            }
-          ]
+          "include": "#parameter-default-types"
         }
       ]
     },
@@ -300,7 +228,13 @@
       "name": "keyword.control.puppet"
     },
     {
+      "include": "#puppet-datatypes"
+    },
+    {
       "include": "#strings"
+    },
+    {
+      "include": "#array"
     },
     {
       "match": "((\\$?)\"?[a-zA-Z_\\x{7f}-\\x{ff}][a-zA-Z0-9_\\x{7f}-\\x{ff}]*\"?):(?=\\s+|$)",
@@ -533,6 +467,9 @@
         },
         {
           "include": "#constants"
+        },
+        {
+          "include": "#puppet-datatypes"
         }
       ]
     },
@@ -665,6 +602,15 @@
         {
           "match": ",",
           "name": "punctuation.separator.parameters.puppet"
+        }
+      ]
+    },
+    "puppet-datatypes": {
+      "patterns": [
+        {
+          "comment": "Puppet Data type",
+          "match": "(?<![a-zA-Z\\$])([A-Z][a-zA-Z]*)(?![a-zA-Z])",
+          "name": "storage.type.puppet"
         }
       ]
     }

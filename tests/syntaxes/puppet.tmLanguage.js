@@ -126,6 +126,81 @@ describe('puppet.tmLanguage', function() {
     });
   });
 
+  describe('data types', function() {
+    var contexts = {
+      'in class parameters': { 'manifest': "class class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.class.puppet'] },
+      'in class body':       { 'manifest': "class class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet'] },
+      'in manifest root':    { 'manifest': "##TESTCASE##}", 'expectedTokenIndex': 0, 'scopesPrefix': ['source.puppet'] },
+      'in plan parameters':  { 'manifest': "plan plan_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.plan.puppet'] },
+    }
+
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var tokenIndex = contexts[contextName]['expectedTokenIndex']
+        var scopesPrefix = contexts[contextName]['scopesPrefix']
+        var manifest = contexts[contextName]['manifest']
+
+        it("tokenizes scalar parameter types", function() {
+          var tokens = getLineTokens(grammar, manifest.replace('##TESTCASE##', 'String $testvar'))
+          expect(tokens[tokenIndex]).to.eql({value: 'String', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+        });
+
+        it("tokenizes scalar parameter variable assignment", function() {
+          var tokens = getLineTokens(grammar, manifest.replace('##TESTCASE##', 'String $testvar = "abc123"'))
+          expect(tokens[tokenIndex]).to.eql({value: 'String', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+        });
+
+        it("tokenizes qualified scalar parameter types", function() {
+          var tokens = getLineTokens(grammar, manifest.replace('##TESTCASE##', 'MyModule::String $testvar = "abc123"'))
+          expect(tokens[tokenIndex+0]).to.eql({value: 'MyModule', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+          expect(tokens[tokenIndex+1]).to.eql({value: '::', scopes: scopesPrefix.concat([])});
+          expect(tokens[tokenIndex+2]).to.eql({value: 'String', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+        });
+
+        it("tokenizes array parameter types", function() {
+          var tokens = getLineTokens(grammar, manifest.replace('##TESTCASE##', 'Array[String] $testvar'))
+          expect(tokens[tokenIndex+0]).to.eql({value: 'Array', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+          expect(tokens[tokenIndex+1]).to.eql({value: '[', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.begin.puppet'])});
+          expect(tokens[tokenIndex+2]).to.eql({value: 'String', scopes: scopesPrefix.concat(['meta.array.puppet', 'storage.type.puppet'])});
+          expect(tokens[tokenIndex+3]).to.eql({value: ']', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.end.puppet'])});
+        });
+
+        it("tokenizes nested array parameter types", function() {
+          var tokens = getLineTokens(grammar, manifest.replace('##TESTCASE##', 'Array[String[1]] $testvar'))
+          expect(tokens[tokenIndex+0]).to.eql({value: 'Array', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+          expect(tokens[tokenIndex+1]).to.eql({value: '[', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.begin.puppet'])});
+          expect(tokens[tokenIndex+2]).to.eql({value: 'String', scopes: scopesPrefix.concat(['meta.array.puppet', 'storage.type.puppet'])});
+          expect(tokens[tokenIndex+3]).to.eql({value: '[', scopes: scopesPrefix.concat(['meta.array.puppet', 'meta.array.puppet', 'punctuation.definition.array.begin.puppet'])});
+          expect(tokens[tokenIndex+4]).to.eql({value: '1', scopes: scopesPrefix.concat(['meta.array.puppet', 'meta.array.puppet', 'constant.numeric.integer.puppet'])});
+          expect(tokens[tokenIndex+5]).to.eql({value: ']', scopes: scopesPrefix.concat(['meta.array.puppet', 'meta.array.puppet', 'punctuation.definition.array.end.puppet'])});
+          expect(tokens[tokenIndex+6]).to.eql({value: ']', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.end.puppet'])});
+        });
+
+        it("tokenizes qualified nested array parameter types", function() {
+          var tokens = getLineTokens(grammar, manifest.replace('##TESTCASE##', 'Array[MyModule::String[1]] $testvar'))
+          expect(tokens[tokenIndex+0]).to.eql({value: 'Array', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+          expect(tokens[tokenIndex+1]).to.eql({value: '[', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.begin.puppet'])});
+          expect(tokens[tokenIndex+2]).to.eql({value: 'MyModule', scopes: scopesPrefix.concat(['meta.array.puppet', 'storage.type.puppet'])});
+          expect(tokens[tokenIndex+3]).to.eql({value: '::', scopes: scopesPrefix.concat(['meta.array.puppet'])});
+          expect(tokens[tokenIndex+4]).to.eql({value: 'String', scopes: scopesPrefix.concat(['meta.array.puppet', 'storage.type.puppet'])});
+          expect(tokens[tokenIndex+5]).to.eql({value: '[', scopes: scopesPrefix.concat(['meta.array.puppet', 'meta.array.puppet', 'punctuation.definition.array.begin.puppet'])});
+          expect(tokens[tokenIndex+6]).to.eql({value: '1', scopes: scopesPrefix.concat(['meta.array.puppet', 'meta.array.puppet', 'constant.numeric.integer.puppet'])});
+          expect(tokens[tokenIndex+7]).to.eql({value: ']', scopes: scopesPrefix.concat(['meta.array.puppet', 'meta.array.puppet', 'punctuation.definition.array.end.puppet'])});
+          expect(tokens[tokenIndex+8]).to.eql({value: ']', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.end.puppet'])});
+        });
+      });
+    };
+
+    context('in class parameters with inherits', function() {
+      // Currently the inherits matcher is overzealous and this test fails.
+      it.skip("tokenizes scalar parameter types", function() {
+        var tokens = getLineTokens(grammar, "class class_name inherits other_class(\n  String $testvar) {}")
+        expect(tokens[6]).to.eql({value: 'other_class', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.definition.class.inherits.puppet', 'support.type.puppet']});
+        expect(tokens[8]).to.eql({value: 'String', scopes: ['source.puppet', 'meta.definition.class.puppet', 'storage.type.puppet']});
+      });
+    });
+  });
+
 
   describe('blocks', function() {
     it("tokenizes single quoted node", function() {
@@ -140,24 +215,26 @@ describe('puppet.tmLanguage', function() {
 
     it("tokenizes non-default class parameters", function() {
       var tokens = getLineTokens(grammar, 'class "classname" ($myvar) {')
-      expect(tokens[5]).to.eql({value: '$', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.no-default.untyped.puppet', 'variable.other.puppet', 'punctuation.definition.variable.puppet']});
-      expect(tokens[6]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.no-default.untyped.puppet', 'variable.other.puppet']});
+      expect(tokens[5]).to.eql({value: '$', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet', 'punctuation.definition.variable.puppet']});
+      expect(tokens[6]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet']});
     });
 
     it("tokenizes default class parameters", function() {
       var tokens = getLineTokens(grammar, 'class "classname" ($myvar = "myval") {')
-      expect(tokens[5]).to.eql({value: '$', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.default.untyped.puppet', 'variable.other.puppet', 'punctuation.definition.variable.puppet']});
-      expect(tokens[6]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.default.untyped.puppet', 'variable.other.puppet']});
+      expect(tokens[5]).to.eql({value: '$', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet', 'punctuation.definition.variable.puppet']});
+      expect(tokens[6]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet']});
     });
 
     it("tokenizes non-default class parameter types", function() {
       var tokens = getLineTokens(grammar, 'class "classname" (String $myvar) {')
-      expect(tokens[5]).to.eql({value: 'String', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.no-default.typed.puppet', 'storage.type.puppet']});
+      expect(tokens[5]).to.eql({value: 'String', scopes: ['source.puppet', 'meta.definition.class.puppet', 'storage.type.puppet']});
+      expect(tokens[8]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet']});
     });
 
     it("tokenizes default class parameter types", function() {
       var tokens = getLineTokens(grammar, 'class "classname" (String $myvar = "myval") {')
-      expect(tokens[5]).to.eql({value: 'String', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.default.typed.puppet', 'storage.type.puppet']});
+      expect(tokens[5]).to.eql({value: 'String', scopes: ['source.puppet', 'meta.definition.class.puppet', 'storage.type.puppet']});
+      expect(tokens[8]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet']});
     });
 
 
