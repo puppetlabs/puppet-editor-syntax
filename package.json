@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/**/*.js"
+    "test": "mocha tests/**/*.js",
+    "convert": "node scripts/convert.js"
   },
   "repository": {
     "type": "git",
@@ -15,6 +16,9 @@
   "devDependencies": {
     "expect.js": "^0.3.1",
     "mocha": "^5.0.1",
-    "vscode-textmate": "^3.2.0"
+    "vscode-textmate": "^3.2.0",
+    "js-yaml": "^3.10.0",
+    "md5": "^2.2.1",
+    "cson": "^5.1.0"
   }
 }
