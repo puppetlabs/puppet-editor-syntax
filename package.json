@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha tests/**/*.js",
-    "convert": "node scripts/convert.js"
+    "convert": "node scripts/convert.js",
+    "inspect": "node scripts/inspect.js"
   },
   "repository": {
     "type": "git",
