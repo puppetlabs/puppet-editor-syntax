@@ -32,7 +32,7 @@ patterns: [
         captures:
           "1":
             name: "storage.modifier.puppet"
-        end: "(?={)"
+        end: "(?=\\(|{)"
         name: "meta.definition.class.inherits.puppet"
         patterns: [
           {

@@ -23,7 +23,7 @@ patterns:
         captures:
           '1':
             name: storage.modifier.puppet
-        end: '(?={)'
+        end: '(?=\(|{)'
         name: meta.definition.class.inherits.puppet
         patterns:
           - match: '\b((?:[-_A-Za-z0-9".]+::)*[-_A-Za-z0-9".]+)\b'

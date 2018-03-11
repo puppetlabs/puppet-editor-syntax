@@ -193,7 +193,7 @@ describe('puppet.tmLanguage', function() {
 
     context('in class parameters with inherits', function() {
       // Currently the inherits matcher is overzealous and this test fails.
-      it.skip("tokenizes scalar parameter types", function() {
+      it("tokenizes scalar parameter types", function() {
         var tokens = getLineTokens(grammar, "class class_name inherits other_class(\n  String $testvar) {}")
         expect(tokens[6]).to.eql({value: 'other_class', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.definition.class.inherits.puppet', 'support.type.puppet']});
         expect(tokens[8]).to.eql({value: 'String', scopes: ['source.puppet', 'meta.definition.class.puppet', 'storage.type.puppet']});
