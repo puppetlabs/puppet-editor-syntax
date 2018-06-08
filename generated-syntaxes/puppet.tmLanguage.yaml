@@ -264,6 +264,7 @@ repository:
     name: meta.array.puppet
     patterns:
       - include: '#parameter-default-types'
+      - include: '#line_comment'
   hash:
     begin: '\{'
     beginCaptures:

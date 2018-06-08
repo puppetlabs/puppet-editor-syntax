@@ -118,6 +118,14 @@ describe('puppet.tmLanguage', function() {
     };
   });
 
+  describe('arrays', function() {
+    it("tokenizes line comments", function() {
+      var tokens = getLineTokens(grammar, "package{ [\n'element1', # This is a comment\n'element2']:\nensure => present\n}")
+
+      expect(tokens[7]).to.eql({value: '#', scopes: ['source.puppet', 'meta.array.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
+      expect(tokens[8]).to.eql({value: ' This is a comment\n', scopes: ['source.puppet', 'meta.array.puppet', 'comment.line.number-sign.puppet']});
+    });
+  });
 
   describe('puppet tasks and plans', function() {
     it("tokenizes plan keyword", function() {
