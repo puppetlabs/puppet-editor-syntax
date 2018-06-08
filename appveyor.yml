@@ -1,0 +1,15 @@
+clone_depth: 10
+init:
+- SET
+
+install:
+  - npm install
+
+test_script:
+  - node --version
+  - npm --version
+  - npm run test
+  - npm run convert error-on-change
+
+# Don't actually build.
+build: off
