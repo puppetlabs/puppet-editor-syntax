@@ -58,7 +58,7 @@ This project makes use of mocha and expect.js.  The tests are located in the `/t
 
 To run tests use;
 
-`npm run tests`
+`npm run test`
 
 ### Converting to other formats
 
