@@ -154,6 +154,7 @@ patterns:
     name: keyword.control.orderarrow.puppet
   - match: ~>
     name: keyword.control.notifyarrow.puppet
+  - include: '#regex-literal'
 repository:
   constants:
     patterns:
@@ -337,4 +338,8 @@ repository:
       - comment: Puppet Data type
         match: '(?<![a-zA-Z\$])([A-Z][a-zA-Z0-9]*)(?![a-zA-Z0-9])'
         name: storage.type.puppet
+  regex-literal:
+    match: '(\/)(.+)(?:\/)'
+    name: string.regexp.literal.puppet
+    comment: Puppet Regular expression literal without interpolation
 
