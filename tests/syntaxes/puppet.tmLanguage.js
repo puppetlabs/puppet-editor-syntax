@@ -209,7 +209,6 @@ describe('puppet.tmLanguage', function() {
     });
   });
 
-
   describe('blocks', function() {
     it("tokenizes single quoted node", function() {
       var tokens = getLineTokens(grammar, "node 'hostname' {")
@@ -304,4 +303,48 @@ describe('puppet.tmLanguage', function() {
       expect(tokens[0]).to.eql({value: 'package', scopes: ['source.puppet', 'meta.definition.resource.puppet', 'storage.type.puppet']});
     });
   });
+
+  describe('chaining arrows', function() {
+    var contexts = {
+      'ordering arrow':  { 'text': '->', 'scope': 'keyword.control.orderarrow.puppet' },
+      'notifying arrow': { 'text': '~>', 'scope': 'keyword.control.notifyarrow.puppet' },
+    }
+
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var arrowText = contexts[contextName]['text'];
+        var arrowScope = contexts[contextName]['scope'];
+
+        it("tokenizes single line chaining", function() {
+          var tokens = getLineTokens(grammar, "Package['ntp'] ##ARROW## File['/etc/ntp.conf']".replace('##ARROW##', arrowText));
+          expect(tokens[7]).to.eql({value: arrowText, scopes: ['source.puppet'].concat(arrowScope)});
+          // Ensure that the trailing and leading resources are still tokenized correctly
+          expect(tokens[0]).to.eql({value: 'Package', scopes: ['source.puppet', 'storage.type.puppet']});
+          expect(tokens[9]).to.eql({value: 'File', scopes: ['source.puppet', 'storage.type.puppet']});
+        });
+
+        it("tokenizes single line chaining without whitespace", function() {
+          var tokens = getLineTokens(grammar, "Package['ntp']##ARROW##File['/etc/ntp.conf']".replace('##ARROW##', arrowText));
+          expect(tokens[6]).to.eql({value: arrowText, scopes: ['source.puppet'].concat(arrowScope)});
+          // Ensure that the trailing and leading resources are still tokenized correctly
+          expect(tokens[0]).to.eql({value: 'Package', scopes: ['source.puppet', 'storage.type.puppet']});
+          expect(tokens[7]).to.eql({value: 'File', scopes: ['source.puppet', 'storage.type.puppet']});
+        });
+
+        it("tokenizes multiline class at end chaining", function() {
+          var tokens = getLineTokens(grammar, "class a {\n} ##ARROW##\nclass b { }".replace('##ARROW##', arrowText));
+          expect(tokens[5]).to.eql({value: arrowText, scopes: ['source.puppet'].concat(arrowScope)});
+          // Ensure that the trailing class is still tokenized correctly
+          expect(tokens[7]).to.eql({value: 'class', scopes: ['source.puppet', 'meta.definition.class.puppet', 'storage.type.puppet']});
+        });
+
+        it("tokenizes multiline class at beginning chaining", function() {
+          var tokens = getLineTokens(grammar, "class a {\n}\n ##ARROW## class b { }".replace('##ARROW##', arrowText));
+          expect(tokens[5]).to.eql({value: arrowText, scopes: ['source.puppet'].concat(arrowScope)});
+          // Ensure that the trailing class is still tokenized correctly
+          expect(tokens[7]).to.eql({value: 'class', scopes: ['source.puppet', 'meta.definition.class.puppet', 'storage.type.puppet']});
+        });
+      });
+    };
+ });
 });

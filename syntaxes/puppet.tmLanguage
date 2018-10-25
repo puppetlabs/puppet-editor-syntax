@@ -34,7 +34,7 @@
     </dict>
     <dict>
       <key>begin</key>
-      <string>^\s*(node|class)\s+((?:[-_A-Za-z0-9"\'.]+::)*[-_A-Za-z0-9"\'.]+)\s*</string>
+      <string>\b(node|class)\s+((?:[-_A-Za-z0-9"\'.]+::)*[-_A-Za-z0-9"\'.]+)\s*</string>
       <key>captures</key>
       <dict>
         <key>1</key>
@@ -430,6 +430,18 @@
       <string>=></string>
       <key>name</key>
       <string>punctuation.separator.key-value.puppet</string>
+    </dict>
+    <dict>
+      <key>match</key>
+      <string>-></string>
+      <key>name</key>
+      <string>keyword.control.orderarrow.puppet</string>
+    </dict>
+    <dict>
+      <key>match</key>
+      <string>~></string>
+      <key>name</key>
+      <string>keyword.control.notifyarrow.puppet</string>
     </dict>
   </array>
   <key>repository</key>
