@@ -159,8 +159,8 @@ describe('puppet.tmLanguage', function() {
         });
 
         it("tokenizes qualified scalar parameter types", function() {
-          var tokens = getLineTokens(grammar, manifest.replace('##TESTCASE##', 'MyModule::String $testvar = "abc123"'))
-          expect(tokens[tokenIndex+0]).to.eql({value: 'MyModule', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+          var tokens = getLineTokens(grammar, manifest.replace('##TESTCASE##', 'MyModule12::String $testvar = "abc123"'))
+          expect(tokens[tokenIndex+0]).to.eql({value: 'MyModule12', scopes: scopesPrefix.concat(['storage.type.puppet'])});
           expect(tokens[tokenIndex+1]).to.eql({value: '::', scopes: scopesPrefix.concat([])});
           expect(tokens[tokenIndex+2]).to.eql({value: 'String', scopes: scopesPrefix.concat(['storage.type.puppet'])});
         });
