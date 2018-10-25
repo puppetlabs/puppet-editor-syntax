@@ -959,7 +959,7 @@
           <key>comment</key>
           <string>Puppet Data type</string>
           <key>match</key>
-          <string>(?&lt;![a-zA-Z\$])([A-Z][a-zA-Z]*)(?![a-zA-Z])</string>
+          <string>(?&lt;![a-zA-Z\$])([A-Z][a-zA-Z0-9]*)(?![a-zA-Z0-9])</string>
           <key>name</key>
           <string>storage.type.puppet</string>
         </dict>
