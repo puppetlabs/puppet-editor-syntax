@@ -279,6 +279,9 @@
     {
       "match": "~>",
       "name": "keyword.control.notifyarrow.puppet"
+    },
+    {
+      "include": "#regex-literal"
     }
   ],
   "repository": {
@@ -624,6 +627,11 @@
           "name": "storage.type.puppet"
         }
       ]
+    },
+    "regex-literal": {
+      "match": "(\\/)(.+)(?:\\/)",
+      "name": "string.regexp.literal.puppet",
+      "comment": "Puppet Regular expression literal without interpolation"
     }
   }
 }

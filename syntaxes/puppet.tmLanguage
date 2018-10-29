@@ -443,6 +443,10 @@
       <key>name</key>
       <string>keyword.control.notifyarrow.puppet</string>
     </dict>
+    <dict>
+      <key>include</key>
+      <string>#regex-literal</string>
+    </dict>
   </array>
   <key>repository</key>
   <dict>
@@ -976,6 +980,15 @@
           <string>storage.type.puppet</string>
         </dict>
       </array>
+    </dict>
+    <key>regex-literal</key>
+    <dict>
+      <key>match</key>
+      <string>(\/)(.+)(?:\/)</string>
+      <key>name</key>
+      <string>string.regexp.literal.puppet</string>
+      <key>comment</key>
+      <string>Puppet Regular expression literal without interpolation</string>
     </dict>
   </dict>
 </dict>

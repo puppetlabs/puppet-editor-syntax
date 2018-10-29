@@ -346,5 +346,26 @@ describe('puppet.tmLanguage', function() {
         });
       });
     };
- });
+  });
+
+  describe('regular expressions', function() {
+    var contexts = {
+      'in basic variable assignment': { 'manifest': "$foo = /abc123/", 'expectedTokenIndex': 3, 'expectedRegExText': 'abc123' },
+      'in basic if statement': { 'manifest': "if 'foo' =~ /walrus/ {\n  $walrus = true\n}", 'expectedTokenIndex': 6, 'expectedRegExText': 'walrus' },
+      'with special characters': { 'manifest': "$foo = /ab\\c#12\\/3/\n$bar = 'wee'", 'expectedTokenIndex': 3, 'expectedRegExText': 'ab\\c#12\\/3' },
+    }
+
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var tokenIndex = contexts[contextName]['expectedTokenIndex']
+        var expectedRegExText = contexts[contextName]['expectedRegExText']
+        var manifest = contexts[contextName]['manifest']
+
+        it("tokenizes regular expression " + contextName, function() {
+          var tokens = getLineTokens(grammar, manifest);
+          expect(tokens[tokenIndex]).to.eql({value: '/' + expectedRegExText + '/', scopes: ['source.puppet', 'string.regexp.literal.puppet']});
+        });
+      });
+    };
+  });
 });
