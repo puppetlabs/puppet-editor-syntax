@@ -905,11 +905,17 @@
         </dict>
       </array>
     </dict>
+    <!-- Ref: https://puppet.com/docs/puppet/latest/lang_variables.html#regular-expressions-for-variable-names -->
     <key>variable</key>
     <dict>
       <key>patterns</key>
       <array>
+        <!--Short variable names can start with underscore -->
         <dict>
+          <key>match</key>
+          <string>(\$)_[a-zA-Z0-9_]*</string>
+          <key>name</key>
+          <string>variable.other.readwrite.global.puppet</string>
           <key>captures</key>
           <dict>
             <key>1</key>
@@ -918,12 +924,13 @@
               <string>punctuation.definition.variable.puppet</string>
             </dict>
           </dict>
-          <key>match</key>
-          <string>(\$)((::)?[a-z]\w*)*((::)?[a-z_]\w*)\b</string>
-          <key>name</key>
-          <string>variable.other.readwrite.global.puppet</string>
         </dict>
+        <!-- Qualified variable names (Can't start with underscore) -->
         <dict>
+          <key>match</key>
+          <string>(\$)(([a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)*)</string>
+          <key>name</key>
+          <string>variable.other.readwrite.global.puppet</string>
           <key>captures</key>
           <dict>
             <key>1</key>
@@ -931,16 +938,7 @@
               <key>name</key>
               <string>punctuation.definition.variable.puppet</string>
             </dict>
-            <key>2</key>
-            <dict>
-              <key>name</key>
-              <string>punctuation.definition.variable.puppet</string>
-            </dict>
           </dict>
-          <key>match</key>
-          <string>(\$\{)(?:[a-zA-Zx7f-xff\$]|::)(?:[a-zA-Z0-9_x7f-xff\$]|::)*(\})</string>
-          <key>name</key>
-          <string>variable.other.readwrite.global.puppet</string>
         </dict>
       </array>
     </dict>

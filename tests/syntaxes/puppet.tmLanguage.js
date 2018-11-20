@@ -368,4 +368,51 @@ describe('puppet.tmLanguage', function() {
       });
     };
   });
+
+  describe('variable names', function() {
+    // Straight up variable names
+    var contexts = {
+      'a bare variable name'               : { 'testcase': "myvar123_456" },
+      'a top level variable name'          : { 'testcase': "::my23_456abc" },
+      'a qualified variable name'          : { 'testcase': "myscope::myvar123_456" },
+      'a top level qualified variable name': { 'testcase': "::myscope::myvar123_456" },
+      'a long qualified variable name'     : { 'testcase': "ab::cd::ef::g123::myvar123_456" },
+      'a hashtable reference'              : { 'testcase': "facts['123']", 'varname': 'facts' },
+      'a function call suffix'             : { 'testcase': "abc123.split()", 'varname': 'abc123' },
+    }
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var testcase = contexts[contextName]['testcase']
+        var varname = contexts[contextName]['varname']
+        // A bit of magic, if the context doesn't define a varname, just use the testcase
+        if (varname === undefined) { varname = testcase; }
+
+        it("tokenizes " + contextName + " entirely with preceding dollar sign", function() {
+          var tokens = getLineTokens(grammar, "$foo = $" + testcase);
+
+          expect(tokens[3]).to.eql({value: '$', scopes: ['source.puppet', 'variable.other.readwrite.global.puppet', 'punctuation.definition.variable.puppet']});
+          expect(tokens[4]).to.eql({value: varname, scopes: ['source.puppet', 'variable.other.readwrite.global.puppet']});
+        });
+      });
+    };
+
+    // Negative tests
+    var contexts = {
+      'starts with a number'                        : { 'testcase': "123abc" },
+      'starts with an underscore in top level scope': { 'testcase': "::_abc" },
+      'has an underscore inside the qualified name' : { 'testcase': "abc::_hij" },
+    }
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var testcase = contexts[contextName]['testcase']
+        var varname = contexts[contextName]['varname']
+        // A bit of magic, if the context doesn't define a varname, just use the testcase
+        if (varname === undefined) { varname = testcase; }
+        it("does not tokenizes a variable name which " + contextName, function() {
+          var tokens = getLineTokens(grammar, "$foo = $" + testcase);
+          expect(tokens[4]).to.not.eql({value: varname, scopes: ['source.puppet', 'variable.other.readwrite.global.puppet']});
+        });
+      });
+    };
+  });
 });
