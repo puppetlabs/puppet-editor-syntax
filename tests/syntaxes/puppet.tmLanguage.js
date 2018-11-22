@@ -368,4 +368,99 @@ describe('puppet.tmLanguage', function() {
       });
     };
   });
+
+  describe('variable names', function() {
+    // Straight up variable names
+    var contexts = {
+      'a bare variable name'               : { 'testcase': "myvar123_456" },
+      'a top level variable name'          : { 'testcase': "::my23_456abc" },
+      'a qualified variable name'          : { 'testcase': "myscope::myvar123_456" },
+      'a top level qualified variable name': { 'testcase': "::myscope::myvar123_456" },
+      'a long qualified variable name'     : { 'testcase': "ab::cd::ef::g123::myvar123_456" },
+      'a hashtable reference'              : { 'testcase': "facts['123']", 'varname': 'facts' },
+      'a function call suffix'             : { 'testcase': "abc123.split()", 'varname': 'abc123' },
+    }
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var testcase = contexts[contextName]['testcase']
+        var varname = contexts[contextName]['varname']
+        // A bit of magic, if the context doesn't define a varname, just use the testcase
+        if (varname === undefined) { varname = testcase; }
+
+        it("tokenizes " + contextName + " entirely with preceding dollar sign", function() {
+          var tokens = getLineTokens(grammar, "$foo = $" + testcase);
+
+          expect(tokens[3]).to.eql({value: '$', scopes: ['source.puppet', 'variable.other.readwrite.global.puppet', 'punctuation.definition.variable.puppet']});
+          expect(tokens[4]).to.eql({value: varname, scopes: ['source.puppet', 'variable.other.readwrite.global.puppet']});
+        });
+      });
+    };
+
+    // Negative tests
+    var contexts = {
+      'starts with a number'                        : { 'testcase': "123abc" },
+      'starts with an underscore in top level scope': { 'testcase': "::_abc" },
+      'has an underscore inside the qualified name' : { 'testcase': "abc::_hij" },
+    }
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var testcase = contexts[contextName]['testcase']
+        var varname = contexts[contextName]['varname']
+        // A bit of magic, if the context doesn't define a varname, just use the testcase
+        if (varname === undefined) { varname = testcase; }
+        it("does not tokenizes a variable name which " + contextName, function() {
+          var tokens = getLineTokens(grammar, "$foo = $" + testcase);
+          expect(tokens[4]).to.not.eql({value: varname, scopes: ['source.puppet', 'variable.other.readwrite.global.puppet']});
+        });
+      });
+    };
+  });
+
+  describe('interpolated strings', function() {
+    var contexts = {
+      'a short variable name'                                   : { 'testcase': "var" },
+      'a short variable name with underscore'                   : { 'testcase': "_var" },
+      'a qualified variable name'                               : { 'testcase': "ab12::cd34::var" },
+      'a qualified short variable name'                         : { 'testcase': "::var" },
+      'a variable with a hashtable reference'                   : { 'testcase': "facts['123']", 'varname': 'facts' },
+      'a short variable with a hashtable reference'             : { 'testcase': "_facts['123']", 'varname': '_facts' },
+      'a variable with a function call suffix'                  : { 'testcase': "abc123.split()", 'varname': 'abc123' },
+      'a variable with an underscore and a function call suffix': { 'testcase': "_abc123.split()", 'varname': '_abc123' },
+    }
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var testcase = contexts[contextName]['testcase']
+        var varname = contexts[contextName]['varname']
+        // A bit of magic, if the context doesn't define a varname, just use the testcase
+        if (varname === undefined) { varname = testcase; }
+
+        var positionContexts = {
+          "whole string"             : { 'prefix': "",        'suffix': "",        'offset': 0 },
+          "right hand side of string": { 'prefix': "prefix ", 'suffix': "",        'offset': 1 },
+          "left hand side of string" : { 'prefix': "",        'suffix': " suffix", 'offset': 0 },
+          "inside of string"         : { 'prefix': "prefix ", 'suffix': " suffix", 'offset': 1 },
+        }
+        for(var posContextName in positionContexts) {
+          context(posContextName, function() {
+            var prefixText = positionContexts[posContextName]['prefix'];
+            var suffixText = positionContexts[posContextName]['suffix'];
+            var tokenOffset = positionContexts[posContextName]['offset'];
+
+            it("tokenizes " + contextName + ", interpolated within double quotes", function() {
+              var tokens = getLineTokens(grammar, "$foo = \"" + prefixText + "${" + testcase + "}" + suffixText + "\"");
+              expect(tokens[5 + tokenOffset]).to.eql({value: varname, scopes: ['source.puppet', 'string.quoted.double.interpolated.puppet', 'meta.embedded.line.puppet', 'source.puppet', 'variable.other.readwrite.global.puppet']});
+            });
+
+            it("tokenizes " + contextName + ", prefixed with dollarsign, interpolated within double quotes", function() {
+              var tokens = getLineTokens(grammar, "$foo = \"" + prefixText + "${$" + testcase + "}" + suffixText + "\"");
+              expect(tokens[5 + tokenOffset]).to.eql({value: '$', scopes:
+                ['source.puppet', 'string.quoted.double.interpolated.puppet', 'meta.embedded.line.puppet', 'source.puppet', 'variable.other.readwrite.global.puppet','punctuation.definition.variable.puppet']});
+              expect(tokens[6 + tokenOffset]).to.eql({value: varname, scopes:
+                ['source.puppet', 'string.quoted.double.interpolated.puppet', 'meta.embedded.line.puppet', 'source.puppet', 'variable.other.readwrite.global.puppet']});
+            });
+          });
+        };
+      });
+    };
+  });
 });
