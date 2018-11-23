@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
 
+## [1.2.0] - 2018-11-27
+
+### Fixed
+- ([GH-16](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/16)) Fix broken variable and interpolated string highlighting
+
 ## [1.1.0] - 2018-10-30
 
 ### Added
