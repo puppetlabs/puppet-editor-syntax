@@ -4,6 +4,8 @@
 
     * Move the Unreleased parts of the changelog to the released section
 
+    * Modify package.json with the new version number
+
 2. Once merged get the commit id of the preparation
 
 3. Tag the commit
