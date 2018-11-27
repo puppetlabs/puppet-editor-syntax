@@ -228,10 +228,13 @@
       "name": "keyword.control.puppet"
     },
     {
-      "include": "#puppet-datatypes"
+      "include": "#heredoc"
     },
     {
       "include": "#strings"
+    },
+    {
+      "include": "#puppet-datatypes"
     },
     {
       "include": "#array"
@@ -702,6 +705,48 @@
       "match": "(\\/)(.+)(?:\\/)",
       "name": "string.regexp.literal.puppet",
       "comment": "Puppet Regular expression literal without interpolation"
+    },
+    "heredoc": {
+      "patterns": [
+        {
+          "begin": "@\\([[:blank:]]*\"([^:\\/) \\t]+)\"[[:blank:]]*(:[[:blank:]]*[a-z][a-zA-Z0-9_+]*[[:blank:]]*)?(\\/[[:blank:]]*[tsrnL$]*)?[[:blank:]]*\\)",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.puppet"
+            }
+          },
+          "end": "^[[:blank:]]*(\\|-|\\||-)?[[:blank:]]*\\1",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.puppet"
+            }
+          },
+          "name": "string.interpolated.heredoc.puppet",
+          "patterns": [
+            {
+              "include": "#escaped_char"
+            },
+            {
+              "include": "#interpolated_puppet"
+            }
+          ]
+        },
+        {
+          "begin": "@\\([[:blank:]]*([^:\\/) \\t]+)[[:blank:]]*(:[[:blank:]]*[a-z][a-zA-Z0-9_+]*[[:blank:]]*)?(\\/[[:blank:]]*[tsrnL$]*)?[[:blank:]]*\\)",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.puppet"
+            }
+          },
+          "end": "^[[:blank:]]*(\\|-|\\||-)?[[:blank:]]*\\1",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.puppet"
+            }
+          },
+          "name": "string.unquoted.heredoc.puppet"
+        }
+      ]
     }
   }
 }
