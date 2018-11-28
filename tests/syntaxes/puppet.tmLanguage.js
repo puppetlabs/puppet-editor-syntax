@@ -14,6 +14,8 @@ function getLineTokens(grammar, content) {
 }
 
 describe('puppet.tmLanguage', function() {
+  this.timeout(20000);
+
   var Registry = require('vscode-textmate').Registry;
   var registry = new Registry();
   var grammar = registry.loadGrammarFromPathSync('./syntaxes/puppet.tmLanguage');
@@ -463,4 +465,186 @@ describe('puppet.tmLanguage', function() {
       });
     };
   });
+
+  describe('non-interpolated heredoc', function() {
+    var contexts = {
+      'start simple variation 1'     : { 'start': "END" },
+      'start simple variation 2'     : { 'start': "  END" },
+      'start simple variation 3'     : { 'start': "END  " },
+      'start simple variation 4'     : { 'start': "\tEND  " },
+      'start syntax variation 1'     : { 'start': "END:abc123" },
+      'start syntax variation 2'     : { 'start': "END: abc123 " },
+      'start syntax variation 3'     : { 'start': "END: abc123" },
+      'start syntax variation 4'     : { 'start': "END:abc123 " },
+      'start syntax variation 5'     : { 'start': "\tEND\t:\tabc123\t" },
+      'start escapes variation 1'    : { 'start': "END/" },
+      'start escapes variation 2'    : { 'start': "END/ts" },
+      'start escapes variation 3'    : { 'start': "END/tsrnL$" },
+      'start escapes variation 4'    : { 'start': "END / tsrnL$" },
+      'start escapes variation 5'    : { 'start': " END/ tsrnL$ " },
+      'start escapes variation 6'    : { 'start': " END/tsrnL$\t" },
+      'start escapes variation 7'    : { 'start': "\tEND\t/\ttsrnL$\t" },
+      'start everything variation 1' : { 'start': "\t  END   :  abc123foobar/\ttsrnL$   \t  " },
+      'start everything variation 2' : { 'start': "END:abc123foobar/tsrnL$" },
+
+      'end simple variation 1'  : { 'end': "END" },
+      'end simple variation 2'  : { 'end': "  END" },
+      'end simple variation 3'  : { 'end': "  END  ", "endTokenText": "  END" },
+      'end simple variation 4'  : { 'end': "END\t",   "endTokenText": "END" },
+      'end simple variation 5'  : { 'end': "|END" },
+      'end simple variation 6'  : { 'end': "|  END  ", "endTokenText": "|  END" },
+      'end simple variation 7'  : { 'end': "  |  \t END" },
+      'end simple variation 8'  : { 'end': "-END" },
+      'end simple variation 9'  : { 'end': "-  END  ", "endTokenText": "-  END" },
+      'end simple variation 10' : { 'end': "\t-  \t END" },
+      'end simple variation 11' : { 'end': "|-END" },
+      'end simple variation 12' : { 'end': "|-  END  ", "endTokenText": "|-  END" },
+      'end simple variation 13' : { 'end': "\t|-  \t END" },
+    }
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var start = contexts[contextName]['start']
+        var startTokenText = contexts[contextName]['startTokenText']
+        var end = contexts[contextName]['end']
+        var endTokenText = contexts[contextName]['endTokenText']
+        // A bit of magic, if the context doesn't define a start, just use 'END'
+        if (start === undefined) { start = 'END'; }
+        if (startTokenText === undefined) { startTokenText = "@(" + start + ")" }
+        if (end === undefined) { end = 'END'; }
+        if (endTokenText === undefined) { endTokenText = end }
+
+        it("tokenizes a " + contextName + " heredoc", function() {
+          var heredocStart = "@(" + start + ")"
+          var heredocEnd = end
+          var tokens = getLineTokens(grammar, "$foo = " + heredocStart + "\nText ${$foo} goes here\n" + end + "\n$foo = 'bar'");
+
+          // Expect that the heredoc is tokenized
+          expect(tokens[3]).to.eql({value: heredocStart, scopes: ['source.puppet', 'string.unquoted.heredoc.puppet', 'punctuation.definition.string.begin.puppet']});
+          expect(tokens[4]).to.eql({value: "\nText ${$foo} goes here\n", scopes: ['source.puppet', 'string.unquoted.heredoc.puppet']});
+          expect(tokens[5]).to.eql({value: endTokenText, scopes: ['source.puppet', 'string.unquoted.heredoc.puppet', 'punctuation.definition.string.end.puppet']});
+          // Expect that things after heredoc is tokenized
+          expect(tokens[7]).to.eql({value: "$", scopes: ['source.puppet', 'variable.other.readwrite.global.puppet', 'punctuation.definition.variable.puppet']});
+        });
+      });
+    };
+
+    context('negative tests', function() {
+      var contexts = {
+        'mismatched start end' : { 'start': "FOO", 'end': "BAR" },
+        'bad syntax'           : { 'start': "END: asd:123 /" },
+        'bad escapes'          : { 'start': "END/abc" },
+        'bad end marker'       : { 'end': "abc |- END" },
+      }
+      for(var contextName in contexts) {
+        context(contextName, function() {
+          var start = contexts[contextName]['start']
+          var startTokenText = contexts[contextName]['startTokenText']
+          var end = contexts[contextName]['end']
+          var endTokenText = contexts[contextName]['endTokenText']
+          // A bit of magic, if the context doesn't define a start, just use 'END'
+          if (start === undefined) { start = 'END'; }
+          if (startTokenText === undefined) { startTokenText = "@(" + start + ")" }
+          if (end === undefined) { end = 'END'; }
+          if (endTokenText === undefined) { endTokenText = end }
+  
+          it("does not tokenizes a " + contextName + " heredoc", function() {
+            var heredocStart = "@(" + start + ")"
+            var heredocEnd = end
+            var tokens = getLineTokens(grammar, "$foo = " + heredocStart + "\nText goes here\n" + end + "\n$foo = 'bar'");
+  
+            // Expect that the heredoc is not tokenized
+            expect(tokens[4]).to.not.eql({value: "\nText goes here\n", scopes: ['source.puppet', 'string.unquoted.heredoc.puppet']});
+            expect(tokens[5]).to.not.eql({value: endTokenText, scopes: ['source.puppet', 'string.unquoted.heredoc.puppet', 'punctuation.definition.string.end.puppet']});
+            // Expect that things after heredoc is not tokenized
+            expect(tokens[7]).to.not.eql({value: "$", scopes: ['source.puppet', 'variable.other.readwrite.global.puppet', 'punctuation.definition.variable.puppet']});
+            });
+        });
+      };
+    });
+  });
+
+  describe('interpolated heredoc', function() {
+    var contexts = {
+      'start simple variation 1'     : { 'start': '"END"' },
+      'start simple variation 2'     : { 'start': '  "END"' },
+      'start simple variation 3'     : { 'start': '"END"  ' },
+      'start simple variation 4'     : { 'start': '\t"END"  ' },
+      'start syntax variation 1'     : { 'start': '"END":abc123' },
+      'start syntax variation 2'     : { 'start': '"END": abc123 ' },
+      'start syntax variation 3'     : { 'start': '"END": abc123' },
+      'start syntax variation 4'     : { 'start': '"END":abc123 ' },
+      'start syntax variation 5'     : { 'start': '\t"END"\t:\tabc123\t' },
+      'start escapes variation 1'    : { 'start': '"END"/' },
+      'start escapes variation 2'    : { 'start': '"END"/ts' },
+      'start escapes variation 3'    : { 'start': '"END"/tsrnL$' },
+      'start escapes variation 4'    : { 'start': '"END" / tsrnL$' },
+      'start escapes variation 5'    : { 'start': ' "END"/ tsrnL$ ' },
+      'start escapes variation 6'    : { 'start': ' "END"/tsrnL$\t' },
+      'start escapes variation 7'    : { 'start': '\t"END"\t/\ttsrnL$\t' },
+      'start everything variation 1' : { 'start': '\t  "END"   :  abc123foobar/\ttsrnL$   \t  ' },
+      'start everything variation 2' : { 'start': '"END":abc123foobar/tsrnL$' },
+    }
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var start = contexts[contextName]['start']
+        var startTokenText = contexts[contextName]['startTokenText']
+        var end = contexts[contextName]['end']
+        var endTokenText = contexts[contextName]['endTokenText']
+        // A bit of magic, if the context doesn't define a start, just use 'END'
+        if (start === undefined) { start = 'END'; }
+        if (startTokenText === undefined) { startTokenText = "@(" + start + ")" }
+        if (end === undefined) { end = 'END'; }
+        if (endTokenText === undefined) { endTokenText = end }
+
+        it("tokenizes a " + contextName + " heredoc", function() {
+          var heredocStart = "@(" + start + ")"
+          var heredocEnd = end
+          var tokens = getLineTokens(grammar, "$foo = " + heredocStart + "\nText ${$foo} goes here\n" + end + "\n$foo = 'bar'");
+
+          // Expect that the heredoc is tokenized
+          expect(tokens[3]).to.eql({value: heredocStart, scopes: ['source.puppet', 'string.interpolated.heredoc.puppet', 'punctuation.definition.string.begin.puppet']});
+          // Expect that interpolated strings tokenized
+          expect(tokens[5]).to.eql({value: "${", scopes: ['source.puppet', 'string.interpolated.heredoc.puppet', 'meta.embedded.line.puppet', 'punctuation.section.embedded.begin.puppet']});
+          // Expect that the heredoc end marker is tokenized
+          expect(tokens[10]).to.eql({value: endTokenText, scopes: ['source.puppet', 'string.interpolated.heredoc.puppet', 'punctuation.definition.string.end.puppet']});
+          // Expect that things after heredoc is tokenized
+          expect(tokens[12]).to.eql({value: "$", scopes: ['source.puppet', 'variable.other.readwrite.global.puppet', 'punctuation.definition.variable.puppet']});
+        });
+      });
+    };
+
+    context('negative tests', function() {
+      var contexts = {
+        'mismatched start end' : { 'start': '"FOO"', 'end': 'BAR' },
+        'bad syntax'           : { 'start': '"END": asd:123 /' },
+        'bad escapes'          : { 'start': '"END"/abc' },
+        'bad end marker'       : { 'end': 'abc |- END' },
+      }
+      for(var contextName in contexts) {
+        context(contextName, function() {
+          var start = contexts[contextName]['start']
+          var startTokenText = contexts[contextName]['startTokenText']
+          var end = contexts[contextName]['end']
+          var endTokenText = contexts[contextName]['endTokenText']
+          // A bit of magic, if the context doesn't define a start, just use 'END'
+          if (start === undefined) { start = 'END'; }
+          if (startTokenText === undefined) { startTokenText = "@(" + start + ")" }
+          if (end === undefined) { end = 'END'; }
+          if (endTokenText === undefined) { endTokenText = end }
+  
+          it("does not tokenizes a " + contextName + " heredoc", function() {
+            var heredocStart = "@(" + start + ")"
+            var heredocEnd = end
+            var tokens = getLineTokens(grammar, "$foo = " + heredocStart + "\nText goes here\n" + end + "\n$foo = 'bar'");
+
+            // Expect that the heredoc is not tokenized
+            expect(tokens[5]).to.not.eql({value: endTokenText, scopes: ['source.puppet', 'string.interpolated.heredoc.puppet', 'punctuation.definition.string.end.puppet']});
+          });
+        });
+      };
+    });
+  });
+
+  
+  
 });
