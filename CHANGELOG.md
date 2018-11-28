@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
 
+## [1.3.0] - 2018-11-29
+
+### Fixed
+- ([GH-22](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/22)) Fix broken heredoc string highlighting
+
 ## [1.2.0] - 2018-11-27
 
 ### Fixed
