@@ -380,7 +380,7 @@ repository:
         match: '(?<![a-zA-Z\$])([A-Z][a-zA-Z0-9]*)(?![a-zA-Z0-9])'
         name: storage.type.puppet
   regex-literal:
-    match: '(\/)(.+)(?:\/)'
+    match: '(\/)(.+?)(?:[^\\]\/)'
     name: string.regexp.literal.puppet
     comment: Puppet Regular expression literal without interpolation
   heredoc:
