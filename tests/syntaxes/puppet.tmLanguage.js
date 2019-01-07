@@ -355,6 +355,7 @@ describe('puppet.tmLanguage', function() {
       'in basic variable assignment': { 'manifest': "$foo = /abc123/", 'expectedTokenIndex': 3, 'expectedRegExText': 'abc123' },
       'in basic if statement': { 'manifest': "if 'foo' =~ /walrus/ {\n  $walrus = true\n}", 'expectedTokenIndex': 6, 'expectedRegExText': 'walrus' },
       'with special characters': { 'manifest': "$foo = /ab\\c#12\\/3/\n$bar = 'wee'", 'expectedTokenIndex': 3, 'expectedRegExText': 'ab\\c#12\\/3' },
+      'in the same line with other slashes': { 'manifest': "/puppet-agent-5\..*/ => 'puppet5/',", 'expectedTokenIndex': 0, 'expectedRegExText': 'puppet-agent-5\..*' },
     }
 
     for(var contextName in contexts) {
@@ -546,12 +547,12 @@ describe('puppet.tmLanguage', function() {
           if (startTokenText === undefined) { startTokenText = "@(" + start + ")" }
           if (end === undefined) { end = 'END'; }
           if (endTokenText === undefined) { endTokenText = end }
-  
+
           it("does not tokenizes a " + contextName + " heredoc", function() {
             var heredocStart = "@(" + start + ")"
             var heredocEnd = end
             var tokens = getLineTokens(grammar, "$foo = " + heredocStart + "\nText goes here\n" + end + "\n$foo = 'bar'");
-  
+
             // Expect that the heredoc is not tokenized
             expect(tokens[4]).to.not.eql({value: "\nText goes here\n", scopes: ['source.puppet', 'string.unquoted.heredoc.puppet']});
             expect(tokens[5]).to.not.eql({value: endTokenText, scopes: ['source.puppet', 'string.unquoted.heredoc.puppet', 'punctuation.definition.string.end.puppet']});
@@ -631,7 +632,7 @@ describe('puppet.tmLanguage', function() {
           if (startTokenText === undefined) { startTokenText = "@(" + start + ")" }
           if (end === undefined) { end = 'END'; }
           if (endTokenText === undefined) { endTokenText = end }
-  
+
           it("does not tokenizes a " + contextName + " heredoc", function() {
             var heredocStart = "@(" + start + ")"
             var heredocEnd = end
@@ -645,6 +646,6 @@ describe('puppet.tmLanguage', function() {
     });
   });
 
-  
-  
+
+
 });

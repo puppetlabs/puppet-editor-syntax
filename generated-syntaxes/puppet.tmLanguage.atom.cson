@@ -587,7 +587,7 @@
       }
     ]
   'regex-literal':
-    'match': '(\\/)(.+)(?:\\/)'
+    'match': '(\\/)(.+?)(?:[^\\\\]\\/)'
     'name': 'string.regexp.literal.puppet'
     'comment': 'Puppet Regular expression literal without interpolation'
   'heredoc':
