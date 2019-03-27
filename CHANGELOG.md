@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
 
+## [1.3.1] - 2018-03-28
+
+### Fixed
+- ([Commit](https://github.com/lingua-pupuli/puppet-editor-syntax/commit/ed18062cc9d904492f02d63b6553e1cadc95664e)) Make regex lazy for syntax highlighting
+
 ## [1.3.0] - 2018-11-29
 
 ### Fixed
