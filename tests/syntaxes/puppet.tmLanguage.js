@@ -1,6 +1,7 @@
 var expect = require('expect.js');
+var fs = require('fs');
 
-function getLineTokens(grammar, content) {
+function getLineTokens(grammar, content, debug = false) {
   var tokens = grammar.tokenizeLine(content).tokens;
 
   for (var i = 0; i < tokens.length; i++) {
@@ -10,15 +11,34 @@ function getLineTokens(grammar, content) {
     delete tokens[i]['endIndex'];
   }
 
+  if (debug) {
+    console.log("------------------");
+    console.log(content);
+    console.log("------------------");
+    console.log(tokens);
+    console.log("------------------");
+  };
+
   return tokens;
 }
 
 describe('puppet.tmLanguage', function() {
+  var grammar;
+
   this.timeout(20000);
 
-  var Registry = require('vscode-textmate').Registry;
-  var registry = new Registry();
-  var grammar = registry.loadGrammarFromPathSync('./syntaxes/puppet.tmLanguage');
+  before('Load Grammar', function(done) {
+    var tm = require('vscode-textmate');
+    var registry = new tm.Registry();
+    // Load the Textmate Grammar
+    const grammarPath = './syntaxes/puppet.tmLanguage';
+    const content = fs.readFileSync(grammarPath);
+    const rawGrammar = tm.parseRawGrammar(content.toString(), grammarPath);
+    registry.addGrammar(rawGrammar).then( (newGrammar) => {
+      grammar = newGrammar;
+      return done();
+    });
+  });
 
   it("default scope is source.puppet", function() {
     var tokens = getLineTokens(grammar, '');
@@ -516,7 +536,6 @@ describe('puppet.tmLanguage', function() {
 
         it("tokenizes a " + contextName + " heredoc", function() {
           var heredocStart = "@(" + start + ")"
-          var heredocEnd = end
           var tokens = getLineTokens(grammar, "$foo = " + heredocStart + "\nText ${$foo} goes here\n" + end + "\n$foo = 'bar'");
 
           // Expect that the heredoc is tokenized
@@ -645,7 +664,4 @@ describe('puppet.tmLanguage', function() {
       };
     });
   });
-
-
-
 });
