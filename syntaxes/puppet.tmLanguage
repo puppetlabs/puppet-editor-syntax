@@ -321,6 +321,7 @@
         </dict>
       </array>
     </dict>
+    <!-- Resource definition using a string based name -->
     <dict>
       <key>captures</key>
       <dict>
@@ -340,9 +341,30 @@
       <key>name</key>
       <string>meta.definition.resource.puppet</string>
     </dict>
+    <!-- Resource definition using a user variable name -->
     <dict>
       <key>match</key>
       <string>^\s*(\w+)\s*{\s*(\$[a-zA-Z_]+)\s*:</string>
+      <key>captures</key>
+      <dict>
+        <key>1</key>
+        <dict>
+          <key>name</key>
+          <string>storage.type.puppet</string>
+        </dict>
+        <key>2</key>
+        <dict>
+          <key>name</key>
+          <string>entity.name.section.puppet</string>
+        </dict>
+      </dict>
+      <key>name</key>
+      <string>meta.definition.resource.puppet</string>
+    </dict>
+    <!-- Resource definition using a predefined name -->
+    <dict>
+      <key>match</key>
+      <string>^\s*(\w+)\s*{\s*(\$(\d+))\s*:</string>
       <key>captures</key>
       <dict>
         <key>1</key>
@@ -508,6 +530,46 @@
       <key>patterns</key>
       <array>
         <!-- These definitions are the #variable matches but expressed as an interpolated string sequence e.g. ${var::foo .... } -->
+        <!-- Predefined variables -->
+        <!-- Similar to https://github.com/rubyide/vscode-ruby/blob/bdad0449bfc12778e1a501c084443ae8f4c94066/syntaxes/ruby.cson.json#L212-L220 -->
+        <dict>
+          <key>begin</key>
+          <string>(\${)(\d+)</string>
+          <key>beginCaptures</key>
+          <dict>
+            <key>1</key>
+            <dict>
+              <key>name</key>
+              <string>punctuation.section.embedded.begin.puppet</string>
+            </dict>
+            <key>2</key>
+            <dict>
+              <key>name</key>
+              <string>source.puppet variable.other.readwrite.global.pre-defined.puppet</string>
+            </dict>
+          </dict>
+          <key>end</key>
+          <string>}</string>
+          <key>endCaptures</key>
+          <dict>
+            <key>0</key>
+            <dict>
+              <key>name</key>
+              <string>punctuation.section.embedded.end.puppet</string>
+            </dict>
+          </dict>
+          <key>contentName</key>
+          <string>source.puppet</string>
+          <key>name</key>
+          <string>meta.embedded.line.puppet</string>
+          <key>patterns</key>
+          <array>
+            <dict>
+              <key>include</key>
+              <string>$self</string>
+            </dict>
+          </array>
+        </dict>
         <!-- Short variable names can start with underscore e.g. "${_foo1}", "${_foo2.split(..)}" -->
         <dict>
           <key>begin</key>
@@ -1034,6 +1096,22 @@
     <dict>
       <key>patterns</key>
       <array>
+        <!-- Predefined variables -->
+        <!-- Similar to https://github.com/rubyide/vscode-ruby/blob/bdad0449bfc12778e1a501c084443ae8f4c94066/syntaxes/ruby.cson.json#L212-L220 -->
+        <dict>
+          <key>match</key>
+          <string>(\$)(\d+)</string>
+          <key>name</key>
+          <string>variable.other.readwrite.global.pre-defined.puppet</string>
+          <key>captures</key>
+          <dict>
+            <key>1</key>
+            <dict>
+              <key>name</key>
+              <string>punctuation.definition.variable.puppet</string>
+            </dict>
+          </dict>
+        </dict>
         <!--Short variable names can start with underscore -->
         <dict>
           <key>match</key>

@@ -127,6 +127,13 @@ patterns:
       '2':
         name: entity.name.section.puppet
     name: meta.definition.resource.puppet
+  - match: '^\s*(\w+)\s*{\s*(\$(\d+))\s*:'
+    captures:
+      '1':
+        name: storage.type.puppet
+      '2':
+        name: entity.name.section.puppet
+    name: meta.definition.resource.puppet
   - match: '\b(case|if|else|elsif|unless)(?!::)\b'
     name: keyword.control.puppet
   - include: '#heredoc'
@@ -176,6 +183,20 @@ repository:
       - include: '#interpolated_puppet'
   interpolated_puppet:
     patterns:
+      - begin: '(\${)(\d+)'
+        beginCaptures:
+          '1':
+            name: punctuation.section.embedded.begin.puppet
+          '2':
+            name: source.puppet variable.other.readwrite.global.pre-defined.puppet
+        end: '}'
+        endCaptures:
+          '0':
+            name: punctuation.section.embedded.end.puppet
+        contentName: source.puppet
+        name: meta.embedded.line.puppet
+        patterns:
+          - include: $self
       - begin: '(\${)(_[a-zA-Z0-9_]*)'
         beginCaptures:
           '1':
@@ -356,6 +377,11 @@ repository:
         name: constant.numeric.integer.puppet
   variable:
     patterns:
+      - match: (\$)(\d+)
+        name: variable.other.readwrite.global.pre-defined.puppet
+        captures:
+          '1':
+            name: punctuation.definition.variable.puppet
       - match: '(\$)_[a-zA-Z0-9_]*'
         name: variable.other.readwrite.global.puppet
         captures:
