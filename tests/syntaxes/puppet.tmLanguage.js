@@ -26,7 +26,6 @@ describe('puppet.tmLanguage', function() {
     expect(tokens[0]).to.eql({value: '', scopes: ['source.puppet']});
   });
 
-
   describe('separators', function() {
     it("tokenizes attribute separator", function() {
       var tokens = getLineTokens(grammar, 'ensure => present');
@@ -123,8 +122,8 @@ describe('puppet.tmLanguage', function() {
     it("tokenizes line comments", function() {
       var tokens = getLineTokens(grammar, "package{ [\n'element1', # This is a comment\n'element2']:\nensure => present\n}")
 
-      expect(tokens[7]).to.eql({value: '#', scopes: ['source.puppet', 'meta.array.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
-      expect(tokens[8]).to.eql({value: ' This is a comment\n', scopes: ['source.puppet', 'meta.array.puppet', 'comment.line.number-sign.puppet']});
+      expect(tokens[8]).to.eql({value: '#', scopes: ['source.puppet', 'entity.name.section.puppet', 'meta.array.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
+      expect(tokens[9]).to.eql({value: ' This is a comment\n', scopes: ['source.puppet', 'entity.name.section.puppet', 'meta.array.puppet', 'comment.line.number-sign.puppet']});
     });
   });
 
@@ -257,15 +256,17 @@ describe('puppet.tmLanguage', function() {
     });
 
     it("tokenizes resource type and string title", function() {
-      var tokens = getLineTokens(grammar, "package {'foo':}")
+      var tokens = getLineTokens(grammar, "package {'foo':}");
+
       expect(tokens[0]).to.eql({value: 'package', scopes: ['source.puppet', 'meta.definition.resource.puppet', 'storage.type.puppet']});
-      expect(tokens[2]).to.eql({value: "'foo'", scopes: ['source.puppet', 'meta.definition.resource.puppet', 'entity.name.section.puppet']});
+      expect(tokens[3]).to.eql({value: "foo", scopes: ['source.puppet', 'entity.name.section.puppet', 'string.quoted.single.puppet']});
     });
 
     it("tokenizes resource type and variable title", function() {
-      var tokens = getLineTokens(grammar, "package {$foo:}")
+      var tokens = getLineTokens(grammar, "package {$foo:}");
+      console.log(tokens);
       expect(tokens[0]).to.eql({value: 'package', scopes: ['source.puppet', 'meta.definition.resource.puppet', 'storage.type.puppet']});
-      expect(tokens[2]).to.eql({value: '$foo', scopes: ['source.puppet', 'meta.definition.resource.puppet', 'entity.name.section.puppet']});
+      expect(tokens[3]).to.eql({value: 'foo', scopes: ['source.puppet', 'entity.name.section.puppet', 'variable.other.readwrite.global.puppet']});
     });
 
     it("tokenizes require classname as an include", function() {
@@ -440,7 +441,7 @@ describe('puppet.tmLanguage', function() {
         it("tokenizes " + contextName + " as a resource name", function() {
           var tokens = getLineTokens(grammar, "user { $" + testcase + ":\n}\n");
 
-          expect(tokens[2]).to.eql({value: '$' + varname, scopes: ['source.puppet', 'meta.definition.resource.puppet', 'entity.name.section.puppet']});
+          expect(tokens[3]).to.eql({value: varname, scopes: ['source.puppet', 'entity.name.section.puppet', 'variable.other.readwrite.global.pre-defined.puppet']});
         });
 
         describe('interpolated strings', function() {
@@ -470,6 +471,29 @@ describe('puppet.tmLanguage', function() {
               });
             });
           };
+        });
+      });
+    };
+  });
+
+  describe('resource names', function() {
+    // Straight up variable names
+    var contexts = {
+      'bareword' :       { 'testcase': "user" },
+      'qualified name' : { 'testcase': "foo::bar" },
+      'top level' :      { 'testcase': "::bar" },
+    }
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var testcase = contexts[contextName]['testcase']
+        var varname = contexts[contextName]['varname']
+        // A bit of magic, if the context doesn't define a varname, just use the testcase
+        if (varname === undefined) { varname = testcase; }
+
+        it("tokenizes " + contextName + " as a resource name", function() {
+          var tokens = getLineTokens(grammar, testcase + " { 'c:\\blah' :\n}\n");
+
+          expect(tokens[0]).to.eql({value: testcase, scopes: ['source.puppet', 'meta.definition.resource.puppet', 'storage.type.puppet']});
         });
       });
     };

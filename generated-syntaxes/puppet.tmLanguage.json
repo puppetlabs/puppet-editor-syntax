@@ -200,40 +200,7 @@
       ]
     },
     {
-      "captures": {
-        "1": {
-          "name": "storage.type.puppet"
-        },
-        "2": {
-          "name": "entity.name.section.puppet"
-        }
-      },
-      "match": "^\\s*(\\w+)\\s*{\\s*([\\'\"].+[\\'\"]):",
-      "name": "meta.definition.resource.puppet"
-    },
-    {
-      "match": "^\\s*(\\w+)\\s*{\\s*(\\$[a-zA-Z_]+)\\s*:",
-      "captures": {
-        "1": {
-          "name": "storage.type.puppet"
-        },
-        "2": {
-          "name": "entity.name.section.puppet"
-        }
-      },
-      "name": "meta.definition.resource.puppet"
-    },
-    {
-      "match": "^\\s*(\\w+)\\s*{\\s*(\\$(\\d+))\\s*:",
-      "captures": {
-        "1": {
-          "name": "storage.type.puppet"
-        },
-        "2": {
-          "name": "entity.name.section.puppet"
-        }
-      },
-      "name": "meta.definition.resource.puppet"
+      "include": "#resource-definition"
     },
     {
       "match": "\\b(case|if|else|elsif|unless)(?!::)\\b",
@@ -689,6 +656,27 @@
           "comment": "FLOAT [(+|-)] digits . digits [e [(+|-)] digits]",
           "match": "(?<!\\w)([-+]?)\\d+\\.\\d+(?i:e(\\+|-){0,1}\\d+){0,1}(?!\\w|\\d)",
           "name": "constant.numeric.integer.puppet"
+        }
+      ]
+    },
+    "resource-definition": {
+      "begin": "^\\s*((?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\\s*({)\\s*",
+      "beginCaptures": {
+        "1": {
+          "name": "meta.definition.resource.puppet storage.type.puppet"
+        }
+      },
+      "end": ":",
+      "contentName": "entity.name.section.puppet",
+      "patterns": [
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#variable"
+        },
+        {
+          "include": "#array"
         }
       ]
     },
