@@ -295,7 +295,7 @@ repository:
     patterns:
       - include: '#strings'
       - include: '#numbers'
-      - include: '#variables'
+      - include: '#variable'
       - include: '#hash'
       - include: '#array'
       - include: '#function_call'
@@ -312,6 +312,7 @@ repository:
         name: punctuation.definition.array.end.puppet
     name: meta.array.puppet
     patterns:
+      - match: '\s*,\s*'
       - include: '#parameter-default-types'
       - include: '#line_comment'
   hash:

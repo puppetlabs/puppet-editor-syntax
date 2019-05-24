@@ -125,6 +125,32 @@ describe('puppet.tmLanguage', function() {
       expect(tokens[8]).to.eql({value: '#', scopes: ['source.puppet', 'entity.name.section.puppet', 'meta.array.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
       expect(tokens[9]).to.eql({value: ' This is a comment\n', scopes: ['source.puppet', 'entity.name.section.puppet', 'meta.array.puppet', 'comment.line.number-sign.puppet']});
     });
+
+    var contexts = {
+      'single quoted string': { 'testcase': "'foo'",           'expectedText': 'foo',      'tokenIndex1': 5, 'tokenIndex2':9,  'scopesSuffix': ['string.quoted.single.puppet'] },
+      'double quoted string': { 'testcase': "\"foo\"",         'expectedText': 'foo',      'tokenIndex1': 5, 'tokenIndex2':9,  'scopesSuffix': ['string.quoted.double.interpolated.puppet'] },
+      'integer':              { 'testcase': "123",             'expectedText': '123',      'tokenIndex1': 4, 'tokenIndex2':6,  'scopesSuffix': ['constant.numeric.integer.puppet'] },
+      'variable':             { 'testcase': "$foo::bar",       'expectedText': 'foo::bar', 'tokenIndex1': 5, 'tokenIndex2':8,  'scopesSuffix': ['variable.other.readwrite.global.puppet'] },
+      'array':                { 'testcase': "['abc']",         'expectedText': 'abc',      'tokenIndex1': 6, 'tokenIndex2':12, 'scopesSuffix': ['meta.array.puppet', 'string.quoted.single.puppet'] },
+      'hash':                 { 'testcase': "{'abc' => 123 }", 'expectedText': 'abc',      'tokenIndex1': 6, 'tokenIndex2':15, 'scopesSuffix': ['meta.hash.puppet', 'string.quoted.single.puppet'] },
+    }
+    for(var contextName in contexts) {
+      context(contextName, function() {
+        var testcase = contexts[contextName]['testcase'];
+        var expectedText = contexts[contextName]['expectedText'];
+        var scopesSuffix = contexts[contextName]['scopesSuffix'];
+        var tokenIndex1 = contexts[contextName]['tokenIndex1'];
+        var tokenIndex2 = contexts[contextName]['tokenIndex2'];
+
+        it("tokenizes " + contextName + " items within the array", function() {
+          // We add the item twice here to make sure it tokenises with a comma delimiting it
+          var tokens = getLineTokens(grammar, "$x = [" + testcase + " , " + testcase + "]")
+
+          expect(tokens[tokenIndex1]).to.eql({value: expectedText, scopes: ['source.puppet', 'meta.array.puppet'].concat(scopesSuffix)});
+          expect(tokens[tokenIndex2]).to.eql({value: expectedText, scopes: ['source.puppet', 'meta.array.puppet'].concat(scopesSuffix)});
+        });
+      });
+    };
   });
 
   describe('puppet tasks and plans', function() {

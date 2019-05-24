@@ -455,7 +455,7 @@ repository:
         include: "#numbers"
       }
       {
-        include: "#variables"
+        include: "#variable"
       }
       {
         include: "#hash"
@@ -484,6 +484,9 @@ repository:
         name: "punctuation.definition.array.end.puppet"
     name: "meta.array.puppet"
     patterns: [
+      {
+        match: "\\s*,\\s*"
+      }
       {
         include: "#parameter-default-types"
       }

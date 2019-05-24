@@ -544,7 +544,7 @@
           "include": "#numbers"
         },
         {
-          "include": "#variables"
+          "include": "#variable"
         },
         {
           "include": "#hash"
@@ -578,6 +578,9 @@
       },
       "name": "meta.array.puppet",
       "patterns": [
+        {
+          "match": "\\s*,\\s*"
+        },
         {
           "include": "#parameter-default-types"
         },
