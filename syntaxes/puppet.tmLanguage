@@ -33,8 +33,33 @@
       <string>comment.block.puppet</string>
     </dict>
     <dict>
+      <!-- node names are basically open to anything https://puppet.com/docs/puppet/6.4/lang_reserved.html#nodes -->
       <key>begin</key>
-      <string>\b(node|class)\s+((?:[-_A-Za-z0-9"\'.]+::)*[-_A-Za-z0-9"\'.]+)\s*</string>
+      <string>\b(node)\s+(\"[^\"]+\"|\'[^\']+\')\s*</string>
+      <key>captures</key>
+      <dict>
+        <key>1</key>
+        <dict>
+          <key>name</key>
+          <string>storage.type.puppet</string>
+        </dict>
+        <key>2</key>
+        <dict>
+          <key>name</key>
+          <string>entity.name.type.class.puppet</string>
+        </dict>
+      </dict>
+      <key>end</key>
+      <string>(?={)</string>
+      <key>name</key>
+      <string>meta.definition.class.puppet</string>
+      <key>patterns</key>
+      <array />
+    </dict>
+    <dict>
+      <!-- Class names are specified as per https://puppet.com/docs/puppet/5.0/lang_reserved.html#classes-and-defined-resource-types -->
+      <key>begin</key>
+      <string>\b(class)\s+((?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+|(?#Bareword Resource Name)[a-z][a-z0-9_]*)\s*</string>
       <key>captures</key>
       <dict>
         <key>1</key>
@@ -146,7 +171,7 @@
     <!-- Ref https://puppet.com/docs/bolt/0.x/writing_plans.html#naming-plans -->
     <dict>
       <key>begin</key>
-      <string>^\s*(plan)\s+((?:[a-z][a-z0-9_]+::)*[a-z][a-z0-9_]+)\s*</string>
+      <string>^\s*(plan)\s+((?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+|(?#Bareword Resource Name)[a-z][a-z0-9_]*)\s*</string>
       <key>captures</key>
       <dict>
         <key>1</key>
