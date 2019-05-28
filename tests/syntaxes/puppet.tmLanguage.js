@@ -270,15 +270,22 @@ describe('puppet.tmLanguage', function() {
       expect(tokens[8]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet']});
     });
 
-
-    it("tokenizes include as an include function", function() {
+    it("tokenizes contain as an include function", function() {
       var tokens = getLineTokens(grammar, "contain foo")
       expect(tokens[0]).to.eql({value: 'contain', scopes: ['source.puppet', 'meta.include.puppet', 'keyword.control.import.include.puppet']});
+      expect(tokens[2]).to.eql({value: 'foo', scopes: ['source.puppet', 'meta.include.puppet', 'variable.parameter.include.puppet']});
     });
 
-    it("tokenizes contain as an include function", function() {
+    it("tokenizes include as an include function", function() {
       var tokens = getLineTokens(grammar, 'include foo')
       expect(tokens[0]).to.eql({value: 'include', scopes: ['source.puppet', 'meta.include.puppet', 'keyword.control.import.include.puppet']});
+      expect(tokens[2]).to.eql({value: 'foo', scopes: ['source.puppet', 'meta.include.puppet', 'variable.parameter.include.puppet']});
+    });
+
+    it("tokenizes import as an include function", function() {
+      var tokens = getLineTokens(grammar, 'import foo')
+      expect(tokens[0]).to.eql({value: 'import', scopes: ['source.puppet', 'meta.include.puppet', 'keyword.control.import.include.puppet']});
+      expect(tokens[2]).to.eql({value: 'foo', scopes: ['source.puppet', 'meta.include.puppet', 'variable.parameter.include.puppet']});
     });
 
     it("tokenizes resource type and string title", function() {
@@ -298,6 +305,7 @@ describe('puppet.tmLanguage', function() {
     it("tokenizes require classname as an include", function() {
       var tokens = getLineTokens(grammar, "require ::foo")
       expect(tokens[0]).to.eql({value: 'require', scopes: ['source.puppet', 'meta.include.puppet', 'keyword.control.import.include.puppet']});
+      expect(tokens[2]).to.eql({value: '::foo', scopes: ['source.puppet', 'meta.include.puppet', 'variable.parameter.include.puppet']});
     });
 
     it("tokenizes require => variable as a parameter", function() {

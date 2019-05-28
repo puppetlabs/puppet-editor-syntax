@@ -374,6 +374,8 @@
       </dict>
       <key>end</key>
       <string>(?=\s|$)</string>
+      <key>contentName</key>
+      <string>variable.parameter.include.puppet</string>
       <key>name</key>
       <string>meta.include.puppet</string>
     </dict>
