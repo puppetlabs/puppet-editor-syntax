@@ -162,10 +162,14 @@ describe('puppet.tmLanguage', function() {
 
   describe('data types', function() {
     var contexts = {
-      'in class parameters': { 'manifest': "class class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.class.puppet'] },
-      'in class body':       { 'manifest': "class class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet'] },
-      'in manifest root':    { 'manifest': "##TESTCASE##}", 'expectedTokenIndex': 0, 'scopesPrefix': ['source.puppet'] },
-      'in plan parameters':  { 'manifest': "plan plan_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.plan.puppet'] },
+      'in class parameters':        { 'manifest': "class class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.class.puppet'] },
+      'in class body':              { 'manifest': "class class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet'] },
+      'in manifest root':           { 'manifest': "##TESTCASE##}", 'expectedTokenIndex': 0, 'scopesPrefix': ['source.puppet'] },
+      'in plan parameters':         { 'manifest': "plan plan_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.plan.puppet'] },
+      'in function parameters':     { 'manifest': "function class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet', 'meta.function.puppet'] },
+      'in function body':           { 'manifest': "function class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 6, 'scopesPrefix': ['source.puppet'] },
+      'in defined type parameters': { 'manifest': "define class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet', 'meta.function.puppet'] },
+      'in defined type body':       { 'manifest': "define class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 6, 'scopesPrefix': ['source.puppet'] },
     }
 
     for(var contextName in contexts) {
@@ -528,6 +532,45 @@ describe('puppet.tmLanguage', function() {
           var tokens = getLineTokens(grammar, testcase + " { 'c:\\blah' :\n}\n");
 
           expect(tokens[0]).to.eql({value: testcase, scopes: ['source.puppet', 'meta.definition.resource.puppet', 'storage.type.puppet']});
+        });
+      });
+    };
+  });
+
+  describe('qualified names', function() {
+    var contexts = {
+      'function' :     { 'manifest': 'function ##TESTCASE## () { }', 'tokenIndex': 2, 'expectedScopes': ['meta.function.puppet', 'entity.name.function.puppet'] },
+      'defined type' : { 'manifest': 'define ##TESTCASE## () { }', 'tokenIndex': 2, 'expectedScopes': ['meta.function.puppet', 'entity.name.function.puppet'] },
+    }
+    for(var contextName in contexts) {
+      context("for a " + contextName, function() {
+        var contextManifest = contexts[contextName]['manifest'];
+        var tokenIndex = contexts[contextName]['tokenIndex'];
+        var scopesSuffix = contexts[contextName]['expectedScopes'];
+
+        var validTestCases = ['foo', '::fo12o_bar', 'foo2::bar3::baz'];
+        var invalidTestCases = ['123foo', '::_foo', 'foo::bar:baz', 'Foo::bar', 'foo::bAr'];
+
+        validTestCases.forEach(function(testCase){
+          it(testCase + " is a valid name", function() {
+            var manifest = contextManifest.replace('##TESTCASE##', testCase)
+            var tokens = getLineTokens(grammar, manifest);
+
+            expect(tokens[tokenIndex]).to.eql({value: testCase, scopes: ['source.puppet'].concat(scopesSuffix)});
+          });
+        });
+
+        invalidTestCases.forEach(function(testCase){
+          it(testCase + " is not a valid name", function() {
+            var manifest = contextManifest.replace('##TESTCASE##', testCase)
+            var tokens = getLineTokens(grammar, manifest);
+
+            if (tokens[tokenIndex] == undefined) {
+              expect(tokens[tokenIndex]).to.be(undefined)
+            } else {
+              expect(tokens[tokenIndex]).to.not.be({value: testCase, scopes: ['source.puppet'].concat(scopesSuffix)});
+            }
+          });
         });
       });
     };
