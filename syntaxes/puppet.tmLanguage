@@ -321,65 +321,9 @@
         </dict>
       </array>
     </dict>
-    <!-- Resource definition using a string based name -->
     <dict>
-      <key>captures</key>
-      <dict>
-        <key>1</key>
-        <dict>
-          <key>name</key>
-          <string>storage.type.puppet</string>
-        </dict>
-        <key>2</key>
-        <dict>
-          <key>name</key>
-          <string>entity.name.section.puppet</string>
-        </dict>
-      </dict>
-      <key>match</key>
-      <string>^\s*(\w+)\s*{\s*([\'"].+[\'"]):</string>
-      <key>name</key>
-      <string>meta.definition.resource.puppet</string>
-    </dict>
-    <!-- Resource definition using a user variable name -->
-    <dict>
-      <key>match</key>
-      <string>^\s*(\w+)\s*{\s*(\$[a-zA-Z_]+)\s*:</string>
-      <key>captures</key>
-      <dict>
-        <key>1</key>
-        <dict>
-          <key>name</key>
-          <string>storage.type.puppet</string>
-        </dict>
-        <key>2</key>
-        <dict>
-          <key>name</key>
-          <string>entity.name.section.puppet</string>
-        </dict>
-      </dict>
-      <key>name</key>
-      <string>meta.definition.resource.puppet</string>
-    </dict>
-    <!-- Resource definition using a predefined name -->
-    <dict>
-      <key>match</key>
-      <string>^\s*(\w+)\s*{\s*(\$(\d+))\s*:</string>
-      <key>captures</key>
-      <dict>
-        <key>1</key>
-        <dict>
-          <key>name</key>
-          <string>storage.type.puppet</string>
-        </dict>
-        <key>2</key>
-        <dict>
-          <key>name</key>
-          <string>entity.name.section.puppet</string>
-        </dict>
-      </dict>
-      <key>name</key>
-      <string>meta.definition.resource.puppet</string>
+      <key>include</key>
+      <string>#resource-definition</string>
     </dict>
     <dict>
       <key>match</key>
@@ -912,7 +856,7 @@
         </dict>
         <dict>
           <key>include</key>
-          <string>#variables</string>
+          <string>#variable</string>
         </dict>
         <dict>
           <key>include</key>
@@ -963,6 +907,10 @@
       <string>meta.array.puppet</string>
       <key>patterns</key>
       <array>
+        <dict>
+          <key>match</key>
+          <string>\s*,\s*</string>
+        </dict>
         <dict>
           <key>include</key>
           <string>#parameter-default-types</string>
@@ -1088,6 +1036,41 @@
           <string>(?&lt;!\w)([-+]?)\d+\.\d+(?i:e(\+|-){0,1}\d+){0,1}(?!\w|\d)</string>
           <key>name</key>
           <string>constant.numeric.integer.puppet</string>
+        </dict>
+      </array>
+    </dict>
+    <!-- Resource definition using a bareword of qualified resource name -->
+    <!-- Reference https://puppet.com/docs/puppet/latest/lang_reserved.html#classes-and-defined-resource-types -->
+    <key>resource-definition</key>
+    <dict>
+      <key>begin</key>
+      <string>^\s*((?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\s*({)\s*</string>
+      <key>beginCaptures</key>
+      <dict>
+        <key>1</key>
+        <dict>
+          <key>name</key>
+          <string>meta.definition.resource.puppet storage.type.puppet</string>
+        </dict>
+      </dict>
+      <key>end</key>
+      <string>:</string>
+      <key>contentName</key>
+      <string>entity.name.section.puppet</string>
+      <!-- Resource title matching patterns -->
+      <key>patterns</key>
+      <array>
+        <dict>
+          <key>include</key>
+          <string>#strings</string>
+        </dict>
+        <dict>
+          <key>include</key>
+          <string>#variable</string>
+        </dict>
+        <dict>
+          <key>include</key>
+          <string>#array</string>
         </dict>
       </array>
     </dict>
