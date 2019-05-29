@@ -6,7 +6,16 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
 
-## [1.3.1] - 2018-03-28
+## [1.3.2] - 2019-05-31
+
+### Fixed
+- ([GH-39](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/39)) Node definitions can only be strings
+- ([GH-38](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/38)) Fix highlighting of classes and functions
+- ([GH-37](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/37)) Tokenise variables within arrays
+- ([GH-32](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/32)) Highlight resource names and titles correctly
+- ([GH-30](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/30)) Highlight regex capture variables
+
+## [1.3.1] - 2019-03-28
 
 ### Fixed
 - ([Commit](https://github.com/lingua-pupuli/puppet-editor-syntax/commit/ed18062cc9d904492f02d63b6553e1cadc95664e)) Make regex lazy for syntax highlighting
