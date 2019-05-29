@@ -108,8 +108,8 @@ describe('puppet.tmLanguage', function() {
               if (tokens[tokenIndex] == undefined) {
                 expect(tokens[tokenIndex]).to.be(undefined)
               } else {
-                expect(tokens[tokenIndex]).to.not.be({value: testCase, scopes: ['source.puppet', 'constant.numeric.hexadecimal.puppet']});
-                expect(tokens[tokenIndex]).to.not.be({value: testCase, scopes: ['source.puppet', 'constant.numeric.integer.puppet']});
+                expect(tokens[tokenIndex]).to.not.eql({value: testCase, scopes: ['source.puppet', 'constant.numeric.hexadecimal.puppet']});
+                expect(tokens[tokenIndex]).to.not.eql({value: testCase, scopes: ['source.puppet', 'constant.numeric.integer.puppet']});
               }
             });
           });
@@ -162,10 +162,14 @@ describe('puppet.tmLanguage', function() {
 
   describe('data types', function() {
     var contexts = {
-      'in class parameters': { 'manifest': "class class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.class.puppet'] },
-      'in class body':       { 'manifest': "class class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet'] },
-      'in manifest root':    { 'manifest': "##TESTCASE##}", 'expectedTokenIndex': 0, 'scopesPrefix': ['source.puppet'] },
-      'in plan parameters':  { 'manifest': "plan plan_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.plan.puppet'] },
+      'in class parameters':        { 'manifest': "class class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.class.puppet'] },
+      'in class body':              { 'manifest': "class class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet'] },
+      'in manifest root':           { 'manifest': "##TESTCASE##}", 'expectedTokenIndex': 0, 'scopesPrefix': ['source.puppet'] },
+      'in plan parameters':         { 'manifest': "plan plan_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.plan.puppet'] },
+      'in function parameters':     { 'manifest': "function class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet', 'meta.function.puppet'] },
+      'in function body':           { 'manifest': "function class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 6, 'scopesPrefix': ['source.puppet'] },
+      'in defined type parameters': { 'manifest': "define class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet', 'meta.function.puppet'] },
+      'in defined type body':       { 'manifest': "define class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 6, 'scopesPrefix': ['source.puppet'] },
     }
 
     for(var contextName in contexts) {
@@ -247,38 +251,45 @@ describe('puppet.tmLanguage', function() {
     });
 
     it("tokenizes non-default class parameters", function() {
-      var tokens = getLineTokens(grammar, 'class "classname" ($myvar) {')
+      var tokens = getLineTokens(grammar, 'class classname ($myvar) {')
       expect(tokens[5]).to.eql({value: '$', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet', 'punctuation.definition.variable.puppet']});
       expect(tokens[6]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet']});
     });
 
     it("tokenizes default class parameters", function() {
-      var tokens = getLineTokens(grammar, 'class "classname" ($myvar = "myval") {')
+      var tokens = getLineTokens(grammar, 'class classname ($myvar = "myval") {')
       expect(tokens[5]).to.eql({value: '$', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet', 'punctuation.definition.variable.puppet']});
       expect(tokens[6]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet']});
     });
 
     it("tokenizes non-default class parameter types", function() {
-      var tokens = getLineTokens(grammar, 'class "classname" (String $myvar) {')
+      var tokens = getLineTokens(grammar, 'class classname (String $myvar) {')
       expect(tokens[5]).to.eql({value: 'String', scopes: ['source.puppet', 'meta.definition.class.puppet', 'storage.type.puppet']});
       expect(tokens[8]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet']});
     });
 
     it("tokenizes default class parameter types", function() {
-      var tokens = getLineTokens(grammar, 'class "classname" (String $myvar = "myval") {')
+      var tokens = getLineTokens(grammar, 'class classname (String $myvar = "myval") {')
       expect(tokens[5]).to.eql({value: 'String', scopes: ['source.puppet', 'meta.definition.class.puppet', 'storage.type.puppet']});
       expect(tokens[8]).to.eql({value: 'myvar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'meta.function.argument.puppet', 'variable.other.puppet']});
     });
 
-
-    it("tokenizes include as an include function", function() {
+    it("tokenizes contain as an include function", function() {
       var tokens = getLineTokens(grammar, "contain foo")
       expect(tokens[0]).to.eql({value: 'contain', scopes: ['source.puppet', 'meta.include.puppet', 'keyword.control.import.include.puppet']});
+      expect(tokens[2]).to.eql({value: 'foo', scopes: ['source.puppet', 'meta.include.puppet', 'variable.parameter.include.puppet']});
     });
 
-    it("tokenizes contain as an include function", function() {
+    it("tokenizes include as an include function", function() {
       var tokens = getLineTokens(grammar, 'include foo')
       expect(tokens[0]).to.eql({value: 'include', scopes: ['source.puppet', 'meta.include.puppet', 'keyword.control.import.include.puppet']});
+      expect(tokens[2]).to.eql({value: 'foo', scopes: ['source.puppet', 'meta.include.puppet', 'variable.parameter.include.puppet']});
+    });
+
+    it("tokenizes import as an include function", function() {
+      var tokens = getLineTokens(grammar, 'import foo')
+      expect(tokens[0]).to.eql({value: 'import', scopes: ['source.puppet', 'meta.include.puppet', 'keyword.control.import.include.puppet']});
+      expect(tokens[2]).to.eql({value: 'foo', scopes: ['source.puppet', 'meta.include.puppet', 'variable.parameter.include.puppet']});
     });
 
     it("tokenizes resource type and string title", function() {
@@ -298,6 +309,7 @@ describe('puppet.tmLanguage', function() {
     it("tokenizes require classname as an include", function() {
       var tokens = getLineTokens(grammar, "require ::foo")
       expect(tokens[0]).to.eql({value: 'require', scopes: ['source.puppet', 'meta.include.puppet', 'keyword.control.import.include.puppet']});
+      expect(tokens[2]).to.eql({value: '::foo', scopes: ['source.puppet', 'meta.include.puppet', 'variable.parameter.include.puppet']});
     });
 
     it("tokenizes require => variable as a parameter", function() {
@@ -520,6 +532,83 @@ describe('puppet.tmLanguage', function() {
           var tokens = getLineTokens(grammar, testcase + " { 'c:\\blah' :\n}\n");
 
           expect(tokens[0]).to.eql({value: testcase, scopes: ['source.puppet', 'meta.definition.resource.puppet', 'storage.type.puppet']});
+        });
+      });
+    };
+  });
+
+  describe('qualified names', function() {
+    var contexts = {
+      'function' :     { 'manifest': 'function ##TESTCASE## () { }', 'tokenIndex': 2, 'expectedScopes': ['meta.function.puppet', 'entity.name.function.puppet'] },
+      'defined type' : { 'manifest': 'define ##TESTCASE## () { }', 'tokenIndex': 2, 'expectedScopes': ['meta.function.puppet', 'entity.name.function.puppet'] },
+      'class' :        { 'manifest': 'class ##TESTCASE## () { }', 'tokenIndex': 2, 'expectedScopes': ['meta.definition.class.puppet', 'entity.name.type.class.puppet'] },
+      'plan' :         { 'manifest': 'plan ##TESTCASE## () { }', 'tokenIndex': 2, 'expectedScopes': ['meta.definition.plan.puppet', 'entity.name.type.plan.puppet'] },
+    }
+    for(var contextName in contexts) {
+      context("for a " + contextName, function() {
+        var contextManifest = contexts[contextName]['manifest'];
+        var tokenIndex = contexts[contextName]['tokenIndex'];
+        var scopesSuffix = contexts[contextName]['expectedScopes'];
+
+        var validTestCases = ['foo', '::fo12o_bar', 'foo2::bar3::baz'];
+        var invalidTestCases = ['123foo', '::_foo', 'foo::bar:baz', 'Foo::bar', 'foo::bAr', '"foo"', "'foo'"];
+
+        validTestCases.forEach(function(testCase){
+          it(testCase + " is a valid name", function() {
+            var manifest = contextManifest.replace('##TESTCASE##', testCase)
+            var tokens = getLineTokens(grammar, manifest);
+
+            expect(tokens[tokenIndex]).to.eql({value: testCase, scopes: ['source.puppet'].concat(scopesSuffix)});
+          });
+        });
+
+        invalidTestCases.forEach(function(testCase){
+          it(testCase + " is not a valid name", function() {
+            var manifest = contextManifest.replace('##TESTCASE##', testCase)
+            var tokens = getLineTokens(grammar, manifest);
+
+            if (tokens[tokenIndex] == undefined) {
+              expect(tokens[tokenIndex]).to.be(undefined)
+            } else {
+              expect(tokens[tokenIndex]).to.not.eql({value: testCase, scopes: ['source.puppet'].concat(scopesSuffix)});
+            }
+          });
+        });
+      });
+    };
+
+    var contexts = {
+      'node' : { 'manifest': 'node ##TESTCASE## { }', 'tokenIndex': 2, 'expectedScopes': ['meta.definition.class.puppet', 'entity.name.type.class.puppet'] },
+    }
+    for(var contextName in contexts) {
+      context("for a " + contextName, function() {
+        var contextManifest = contexts[contextName]['manifest'];
+        var tokenIndex = contexts[contextName]['tokenIndex'];
+        var scopesSuffix = contexts[contextName]['expectedScopes'];
+
+        var validTestCases = ['"foo"', "'foo'", "'foo2._local'", '"#{foo}"', "'foo\"'", '"foo\'"'];
+        var invalidTestCases = ['foo', "'foo\""];
+
+        validTestCases.forEach(function(testCase){
+          it(testCase + " is a valid name", function() {
+            var manifest = contextManifest.replace('##TESTCASE##', testCase)
+            var tokens = getLineTokens(grammar, manifest);
+
+            expect(tokens[tokenIndex]).to.eql({value: testCase, scopes: ['source.puppet'].concat(scopesSuffix)});
+          });
+        });
+
+        invalidTestCases.forEach(function(testCase){
+          it(testCase + " is not a valid name", function() {
+            var manifest = contextManifest.replace('##TESTCASE##', testCase)
+            var tokens = getLineTokens(grammar, manifest);
+
+            if (tokens[tokenIndex] == undefined) {
+              expect(tokens[tokenIndex]).to.be(undefined)
+            } else {
+              expect(tokens[tokenIndex]).to.not.eql({value: testCase, scopes: ['source.puppet'].concat(scopesSuffix)});
+            }
+          });
         });
       });
     };

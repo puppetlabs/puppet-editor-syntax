@@ -10,7 +10,16 @@ patterns:
   - begin: ^\s*/\*
     end: \*/
     name: comment.block.puppet
-  - begin: '\b(node|class)\s+((?:[-_A-Za-z0-9"\''.]+::)*[-_A-Za-z0-9"\''.]+)\s*'
+  - begin: '\b(node)\s+(\"[^\"]+\"|\''[^\'']+\'')\s*'
+    captures:
+      '1':
+        name: storage.type.puppet
+      '2':
+        name: entity.name.type.class.puppet
+    end: '(?={)'
+    name: meta.definition.class.puppet
+    patterns: []
+  - begin: '\b(class)\s+((?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+|(?#Bareword Resource Name)[a-z][a-z0-9_]*)\s*'
     captures:
       '1':
         name: storage.type.puppet
@@ -29,27 +38,9 @@ patterns:
           - match: '\b((?:[-_A-Za-z0-9".]+::)*[-_A-Za-z0-9".]+)\b'
             name: support.type.puppet
       - include: '#line_comment'
-      - captures:
-          '1':
-            name: variable.other.puppet
-          '2':
-            name: punctuation.definition.variable.puppet
-        match: '((\$+)[a-zA-Z_][a-zA-Z0-9_]*)\s*(?=,|\))'
-        name: meta.function.argument.puppet
-      - begin: '((\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\s*(=)\s*)\s*'
-        captures:
-          '1':
-            name: variable.other.puppet
-          '2':
-            name: punctuation.definition.variable.puppet
-          '3':
-            name: keyword.operator.assignment.puppet
-        end: '(?=,|\))'
-        name: meta.function.argument.puppet
-        patterns:
-          - include: '#parameter-default-types'
+      - include: '#resource-parameters'
       - include: '#parameter-default-types'
-  - begin: '^\s*(plan)\s+((?:[a-z][a-z0-9_]+::)*[a-z][a-z0-9_]+)\s*'
+  - begin: '^\s*(plan)\s+((?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+|(?#Bareword Resource Name)[a-z][a-z0-9_]*)\s*'
     captures:
       '1':
         name: storage.type.puppet
@@ -59,60 +50,20 @@ patterns:
     name: meta.definition.plan.puppet
     patterns:
       - include: '#line_comment'
-      - captures:
-          '1':
-            name: variable.other.puppet
-          '2':
-            name: punctuation.definition.variable.puppet
-        match: '((\$+)[a-zA-Z_][a-zA-Z0-9_]*)\s*(?=,|\))'
-        name: meta.function.argument.puppet
-      - begin: '((\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\s*(=)\s*)\s*'
-        captures:
-          '1':
-            name: variable.other.puppet
-          '2':
-            name: punctuation.definition.variable.puppet
-          '3':
-            name: keyword.operator.assignment.puppet
-        end: '(?=,|\))'
-        name: meta.function.argument.puppet
-        patterns:
-          - include: '#parameter-default-types'
+      - include: '#resource-parameters'
       - include: '#parameter-default-types'
-  - begin: '^\s*(define|function)\s+([a-zA-Z0-9_:]+)\s*(\()'
-    beginCaptures:
+  - begin: '^\s*(define|function)\s+((?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\s*(\()'
+    captures:
       '1':
         name: storage.type.function.puppet
       '2':
         name: entity.name.function.puppet
-      '3':
-        name: punctuation.definition.parameters.begin.puppet
-    contentName: meta.function.arguments.puppet
-    end: \)
-    endCaptures:
-      '1':
-        name: punctuation.definition.parameters.end.puppet
+    end: '(?={)'
     name: meta.function.puppet
     patterns:
-      - captures:
-          '1':
-            name: variable.other.puppet
-          '2':
-            name: punctuation.definition.variable.puppet
-        match: '((\$+)[a-zA-Z_][a-zA-Z0-9_]*)\s*(?=,|\))'
-        name: meta.function.argument.no-default.puppet
-      - begin: '((\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\s*(=)\s*)\s*'
-        captures:
-          '1':
-            name: variable.other.puppet
-          '2':
-            name: punctuation.definition.variable.puppet
-          '3':
-            name: keyword.operator.assignment.puppet
-        end: '(?=,|\))'
-        name: meta.function.argument.default.puppet
-        patterns:
-          - include: '#parameter-default-types'
+      - include: '#line_comment'
+      - include: '#resource-parameters'
+      - include: '#parameter-default-types'
   - include: '#resource-definition'
   - match: '\b(case|if|else|elsif|unless)(?!::)\b'
     name: keyword.control.puppet
@@ -129,6 +80,7 @@ patterns:
       '1':
         name: keyword.control.import.include.puppet
     end: (?=\s|$)
+    contentName: variable.parameter.include.puppet
     name: meta.include.puppet
   - match: \b\w+\s*(?==>)\s*
     name: constant.other.key.puppet
@@ -301,6 +253,27 @@ repository:
       - include: '#function_call'
       - include: '#constants'
       - include: '#puppet-datatypes'
+  resource-parameters:
+    patterns:
+      - captures:
+          '1':
+            name: variable.other.puppet
+          '2':
+            name: punctuation.definition.variable.puppet
+        match: '((\$+)[a-zA-Z_][a-zA-Z0-9_]*)\s*(?=,|\))'
+        name: meta.function.argument.puppet
+      - begin: '((\$+)[a-zA-Z_][a-zA-Z0-9_]*)(?:\s*(=)\s*)\s*'
+        captures:
+          '1':
+            name: variable.other.puppet
+          '2':
+            name: punctuation.definition.variable.puppet
+          '3':
+            name: keyword.operator.assignment.puppet
+        end: '(?=,|\))'
+        name: meta.function.argument.puppet
+        patterns:
+          - include: '#parameter-default-types'
   array:
     begin: '(\[)'
     beginCaptures:
