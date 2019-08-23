@@ -164,7 +164,7 @@ describe('puppet.tmLanguage', function() {
     var contexts = {
       'in class parameters':        { 'manifest': "class class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.class.puppet'] },
       'in class body':              { 'manifest': "class class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet'] },
-      'in manifest root':           { 'manifest': "##TESTCASE##}", 'expectedTokenIndex': 0, 'scopesPrefix': ['source.puppet'] },
+      'in manifest root':           { 'manifest': " ##TESTCASE##", 'expectedTokenIndex': 1, 'scopesPrefix': ['source.puppet'] },
       'in plan parameters':         { 'manifest': "plan plan_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 4, 'scopesPrefix': ['source.puppet', 'meta.definition.plan.puppet'] },
       'in function parameters':     { 'manifest': "function class_name(\n  ##TESTCASE##) {}", 'expectedTokenIndex': 5, 'scopesPrefix': ['source.puppet', 'meta.function.puppet'] },
       'in function body':           { 'manifest': "function class_name() {\n  ##TESTCASE##\n}", 'expectedTokenIndex': 6, 'scopesPrefix': ['source.puppet'] },
@@ -201,6 +201,24 @@ describe('puppet.tmLanguage', function() {
           expect(tokens[tokenIndex+1]).to.eql({value: '[', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.begin.puppet'])});
           expect(tokens[tokenIndex+2]).to.eql({value: 'String', scopes: scopesPrefix.concat(['meta.array.puppet', 'storage.type.puppet'])});
           expect(tokens[tokenIndex+3]).to.eql({value: ']', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.end.puppet'])});
+        });
+
+        it("tokenizes singular resource reference", function () {
+          var tokens = getLineTokens(grammar, manifest.replace('##TESTCASE##', 'Foo_bar["something"] $testvar'))
+          expect(tokens[tokenIndex+0]).to.eql({value: 'Foo_bar', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+          expect(tokens[tokenIndex+1]).to.eql({value: '[', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.begin.puppet'])});
+          expect(tokens[tokenIndex+3]).to.eql({value: 'something', scopes: scopesPrefix.concat(['meta.array.puppet', 'string.quoted.double.interpolated.puppet'])});
+          expect(tokens[tokenIndex+5]).to.eql({value: ']', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.end.puppet'])});
+        });
+
+        it("tokenizes singular qualified resource reference", function () {
+          console.log(manifest.replace('##TESTCASE##', '::Foo_bar::Baz["something"] $testvar'));
+          var tokens = getLineTokens(grammar, manifest.replace('##TESTCASE##', '::Foo_bar::Baz["something"] $testvar'))
+          expect(tokens[tokenIndex+0]).to.eql({value: 'Foo_bar', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+          expect(tokens[tokenIndex+2]).to.eql({value: 'Baz', scopes: scopesPrefix.concat(['storage.type.puppet'])});
+          expect(tokens[tokenIndex+3]).to.eql({value: '[', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.begin.puppet'])});
+          expect(tokens[tokenIndex+5]).to.eql({value: 'something', scopes: scopesPrefix.concat(['meta.array.puppet', 'string.quoted.double.interpolated.puppet'])});
+          expect(tokens[tokenIndex+7]).to.eql({value: ']', scopes: scopesPrefix.concat(['meta.array.puppet', 'punctuation.definition.array.end.puppet'])});
         });
 
         it("tokenizes nested array parameter types", function() {
@@ -301,7 +319,6 @@ describe('puppet.tmLanguage', function() {
 
     it("tokenizes resource type and variable title", function() {
       var tokens = getLineTokens(grammar, "package {$foo:}");
-      console.log(tokens);
       expect(tokens[0]).to.eql({value: 'package', scopes: ['source.puppet', 'meta.definition.resource.puppet', 'storage.type.puppet']});
       expect(tokens[3]).to.eql({value: 'foo', scopes: ['source.puppet', 'entity.name.section.puppet', 'variable.other.readwrite.global.puppet']});
     });
@@ -383,6 +400,12 @@ describe('puppet.tmLanguage', function() {
           expect(tokens[5]).to.eql({value: arrowText, scopes: ['source.puppet'].concat(arrowScope)});
           // Ensure that the trailing class is still tokenized correctly
           expect(tokens[7]).to.eql({value: 'class', scopes: ['source.puppet', 'meta.definition.class.puppet', 'storage.type.puppet']});
+        });
+
+        it("tokenizes resource names after the arrow", function() {
+          var tokens = getLineTokens(grammar, "class a {\n}\n ##ARROW## resource::name { 'something': }".replace('##ARROW##', arrowText));
+          expect(tokens[5]).to.eql({value: arrowText, scopes: ['source.puppet'].concat(arrowScope)});
+          expect(tokens[7]).to.eql({value: 'resource::name', scopes: ['source.puppet', 'meta.definition.resource.puppet', 'storage.type.puppet']});
         });
       });
     };

@@ -529,7 +529,7 @@
       }
     ]
   'resource-definition':
-    'begin': '^\\s*((?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\\s*({)\\s*'
+    'begin': '(?:^\\s*|\\s+)((?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\\s*({)\\s*'
     'beginCaptures':
       '1':
         'name': 'meta.definition.resource.puppet storage.type.puppet'
@@ -587,7 +587,7 @@
     'patterns': [
       {
         'comment': 'Puppet Data type'
-        'match': '(?<![a-zA-Z\\$])([A-Z][a-zA-Z0-9]*)(?![a-zA-Z0-9])'
+        'match': '(?<![a-zA-Z\\$])([A-Z][a-zA-Z0-9_]*)(?![a-zA-Z0-9_])'
         'name': 'storage.type.puppet'
       }
     ]
