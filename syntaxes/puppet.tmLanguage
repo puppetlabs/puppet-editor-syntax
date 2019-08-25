@@ -975,12 +975,12 @@
         </dict>
       </array>
     </dict>
-    <!-- Resource definition using a bareword of qualified resource name -->
+    <!-- Resource definition using a bareword or qualified resource name -->
     <!-- Reference https://puppet.com/docs/puppet/latest/lang_reserved.html#classes-and-defined-resource-types -->
     <key>resource-definition</key>
     <dict>
       <key>begin</key>
-      <string>^\s*((?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\s*({)\s*</string>
+      <string>(?:^\s*|\s+)((?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\s*({)\s*</string>
       <key>beginCaptures</key>
       <dict>
         <key>1</key>
@@ -1085,7 +1085,12 @@
         </dict>
       </array>
     </dict>
-    <!-- Ref: https://github.com/puppetlabs/puppet-specifications/blob/master/language/types_values_variables.md#the-type-system -->
+    <!--
+      Ref: https://github.com/puppetlabs/puppet-specifications/blob/master/language/types_values_variables.md#the-type-system
+
+      Resource References using a bareword or qualified resource name, but with captialised first segment letter, followed by opening square bracket, but that can
+      have underscores as well. Resource References are technically a Puppet Data Type, so use the same tags
+      Ref: https://puppet.com/docs/puppet/latest/lang_data_resource_reference.html -->
     <key>puppet-datatypes</key>
     <dict>
       <key>patterns</key>
@@ -1094,7 +1099,7 @@
           <key>comment</key>
           <string>Puppet Data type</string>
           <key>match</key>
-          <string>(?&lt;![a-zA-Z\$])([A-Z][a-zA-Z0-9]*)(?![a-zA-Z0-9])</string>
+          <string>(?&lt;![a-zA-Z\$])([A-Z][a-zA-Z0-9_]*)(?![a-zA-Z0-9_])</string>
           <key>name</key>
           <string>storage.type.puppet</string>
         </dict>
