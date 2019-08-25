@@ -485,6 +485,9 @@
       {
         'include': '#parameter-default-types'
       }
+      {
+        'include': '#line_comment'
+      }
     ]
   'single-quoted-string':
     'begin': '\''

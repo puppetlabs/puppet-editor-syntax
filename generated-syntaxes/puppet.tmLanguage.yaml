@@ -302,6 +302,7 @@ repository:
       - match: \b\w+\s*(?==>)\s*
         name: constant.other.key.puppet
       - include: '#parameter-default-types'
+      - include: '#line_comment'
   single-quoted-string:
     begin: ''''
     beginCaptures:
