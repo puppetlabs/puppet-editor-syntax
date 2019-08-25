@@ -118,6 +118,17 @@ describe('puppet.tmLanguage', function() {
     };
   });
 
+  describe('hashes', function() {
+    it("tokenizes line comments", function() {
+      var tokens = getLineTokens(grammar, "$x4 = [{ key1 => 'value',\n# comment\n}]")
+
+      token_prefix = [ 'source.puppet', 'meta.array.puppet', 'meta.hash.puppet', 'meta.comment.full-line.puppet', 'comment.line.number-sign.puppet' ]
+
+      expect(tokens[12]).to.eql({value: '#', scopes: token_prefix.concat(['punctuation.definition.comment.puppet'])});
+      expect(tokens[13]).to.eql({value: ' comment\n', scopes: token_prefix});
+    });
+  });
+
   describe('arrays', function() {
     it("tokenizes line comments", function() {
       var tokens = getLineTokens(grammar, "package{ [\n'element1', # This is a comment\n'element2']:\nensure => present\n}")
