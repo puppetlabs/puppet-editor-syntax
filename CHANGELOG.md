@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
 
+## [1.3.3] - 2019-08-26
+
+### Fixed
+- ([GH-43](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/43)) Fix syntax highlighting for resource references and chain arrows
+- ([GH-34](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/34)) Comments in hashes should tokenize
+
 ## [1.3.2] - 2019-05-31
 
 ### Fixed
