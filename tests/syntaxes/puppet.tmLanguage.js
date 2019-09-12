@@ -370,6 +370,27 @@ describe('puppet.tmLanguage', function() {
       var tokens = getLineTokens(grammar, "package {'foo':}")
       expect(tokens[0]).to.eql({value: 'package', scopes: ['source.puppet', 'meta.definition.resource.puppet', 'storage.type.puppet']});
     });
+
+    describe('if else statements', function() {
+      var contexts = {
+        'spaced correctly': { 'expectedElseTokenIndex': 12, 'manifest': "if $foo {\n  $bar = '1'\n} else {\n  $bar = '2'\n}" },
+        'on same line':     { 'expectedElseTokenIndex': 12, 'manifest': "if $foo { $bar = '1' } else {  $bar = '2' }" },
+        'no spaces':        { 'expectedElseTokenIndex': 12, 'manifest': "if $foo {\n  $bar = '1'\n}else{\n  $bar = '2'\n}" },
+      }
+
+      for(var contextName in contexts) {
+        context(contextName, function() {
+          var manifest = contexts[contextName]['manifest']
+          var elseTokenIndex = contexts[contextName]['expectedElseTokenIndex']
+
+          it("tokenizes when " + contextName, function () {
+            var tokens = getLineTokens(grammar, manifest);
+            expect(tokens[0]).to.eql({value: 'if', scopes: ['source.puppet', 'keyword.control.puppet']});
+            expect(tokens[elseTokenIndex]).to.eql({ value: 'else', scopes: ['source.puppet', 'keyword.control.puppet'] });
+          });
+        });
+      };
+    });
   });
 
   describe('chaining arrows', function() {

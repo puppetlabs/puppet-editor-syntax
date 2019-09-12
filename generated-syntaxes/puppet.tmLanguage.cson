@@ -106,11 +106,13 @@ patterns: [
     ]
   }
   {
-    include: "#resource-definition"
+    match: "\\b(case|else|elsif|if|unless)(?!::)\\b"
+    captures:
+      "1":
+        name: "keyword.control.puppet"
   }
   {
-    match: "\\b(case|if|else|elsif|unless)(?!::)\\b"
-    name: "keyword.control.puppet"
+    include: "#resource-definition"
   }
   {
     include: "#heredoc"
@@ -531,7 +533,7 @@ repository:
       }
     ]
   "resource-definition":
-    begin: "(?:^\\s*|\\s+)((?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\\s*({)\\s*"
+    begin: "(?:^|\\b)((?#Toplevel Bareword)::[a-z][a-z0-9_]*|(?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\\s*({)\\s*"
     beginCaptures:
       "1":
         name: "meta.definition.resource.puppet storage.type.puppet"

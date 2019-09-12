@@ -64,9 +64,11 @@ patterns:
       - include: '#line_comment'
       - include: '#resource-parameters'
       - include: '#parameter-default-types'
+  - match: '\b(case|else|elsif|if|unless)(?!::)\b'
+    captures:
+      '1':
+        name: keyword.control.puppet
   - include: '#resource-definition'
-  - match: '\b(case|if|else|elsif|unless)(?!::)\b'
-    name: keyword.control.puppet
   - include: '#heredoc'
   - include: '#strings'
   - include: '#puppet-datatypes'
@@ -331,7 +333,7 @@ repository:
         match: '(?<!\w)([-+]?)\d+\.\d+(?i:e(\+|-){0,1}\d+){0,1}(?!\w|\d)'
         name: constant.numeric.integer.puppet
   resource-definition:
-    begin: '(?:^\s*|\s+)((?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\s*({)\s*'
+    begin: '(?:^|\b)((?#Toplevel Bareword)::[a-z][a-z0-9_]*|(?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\s*({)\s*'
     beginCaptures:
       '1':
         name: meta.definition.resource.puppet storage.type.puppet

@@ -193,14 +193,20 @@
       </array>
     </dict>
     <dict>
-      <key>include</key>
-      <string>#resource-definition</string>
+      <key>match</key>
+      <string>\b(case|else|elsif|if|unless)(?!::)\b</string>
+      <key>captures</key>
+      <dict>
+        <key>1</key>
+        <dict>
+          <key>name</key>
+          <string>keyword.control.puppet</string>
+        </dict>
+      </dict>
     </dict>
     <dict>
-      <key>match</key>
-      <string>\b(case|if|else|elsif|unless)(?!::)\b</string>
-      <key>name</key>
-      <string>keyword.control.puppet</string>
+      <key>include</key>
+      <string>#resource-definition</string>
     </dict>
     <dict>
       <key>include</key>
@@ -980,7 +986,7 @@
     <key>resource-definition</key>
     <dict>
       <key>begin</key>
-      <string>(?:^\s*|\s+)((?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\s*({)\s*</string>
+      <string>(?:^|\b)((?#Toplevel Bareword)::[a-z][a-z0-9_]*|(?#Bareword Resource Name)[a-z][a-z0-9_]*|(?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+)\s*({)\s*</string>
       <key>beginCaptures</key>
       <dict>
         <key>1</key>
