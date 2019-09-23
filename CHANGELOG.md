@@ -6,6 +6,11 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
 
+## [1.3.4] - 2019-09-20
+
+### Fixed
+- ([GH-48](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/48)) Correctly tokenise if-else
+
 ## [1.3.3] - 2019-08-26
 
 ### Fixed
