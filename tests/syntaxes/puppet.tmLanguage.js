@@ -469,6 +469,7 @@ describe('puppet.tmLanguage', function() {
     // Straight up variable names
     var contexts = {
       'a bare variable name'               : { 'testcase': "myvar123_456" },
+      'a bare camelcase variable name'     : { 'testcase': "myVariableName" },
       'a top level variable name'          : { 'testcase': "::my23_456abc" },
       'a qualified variable name'          : { 'testcase': "myscope::myvar123_456" },
       'a top level qualified variable name': { 'testcase': "::myscope::myvar123_456" },

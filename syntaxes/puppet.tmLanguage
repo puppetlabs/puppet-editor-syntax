@@ -1055,7 +1055,7 @@
         <!-- Qualified variable names (Can't start with underscore) -->
         <dict>
           <key>match</key>
-          <string>(\$)(([a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)*)</string>
+          <string>(\$)(([a-z][a-zA-Z0-9_]*)?(?:::[a-z][a-zA-Z0-9_]*)*)</string>
           <key>name</key>
           <string>variable.other.readwrite.global.puppet</string>
           <key>captures</key>
