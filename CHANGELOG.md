@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
 
+## [1.3.5] - 2019-03-26
+
+### Fixed
+
+- ([GH-52](https://github.com/lingua-pupuli/puppet-editor-syntax/issues/52)) Allow uppercase letters in variable names
+
 ## [1.3.4] - 2019-09-20
 
 ### Fixed
