@@ -717,7 +717,7 @@
               "name": "punctuation.definition.string.begin.puppet"
             }
           },
-          "end": "^[[:blank:]]*(\\|-|\\||-)?[[:blank:]]*\\1",
+          "end": "^[[:blank:]]*(\\|[[:blank:]]*-|\\||-)?[[:blank:]]*\\1",
           "endCaptures": {
             "0": {
               "name": "punctuation.definition.string.end.puppet"
@@ -740,7 +740,7 @@
               "name": "punctuation.definition.string.begin.puppet"
             }
           },
-          "end": "^[[:blank:]]*(\\|-|\\||-)?[[:blank:]]*\\1",
+          "end": "^[[:blank:]]*(\\|[[:blank:]]*-|\\||-)?[[:blank:]]*\\1",
           "endCaptures": {
             "0": {
               "name": "punctuation.definition.string.end.puppet"
