@@ -38,6 +38,45 @@ describe('puppet.tmLanguage', function() {
     });
   });
 
+  // Reference https://puppet.com/docs/puppet/latest/lang_data_string.html#reference-9324
+  describe('heredoc', function () {
+    var contexts = {
+      'minimal': { 'start': '@(EOT)', 'end': 'EOT', 'scope': 'string.unquoted.heredoc.puppet' },
+      'full with no spacing': { 'start': '@(EOT/tsrnL$)', 'end': '|-EOT', 'scope': 'string.unquoted.heredoc.puppet' },
+      'full with much spacing': { 'start': '@(   EOT   /   tsrnL$   )', 'end': '|   -   EOT', 'scope': 'string.unquoted.heredoc.puppet' },
+      // With interpolation
+      'minimal interpolation': { 'start': '@("EOT")', 'end': 'EOT', 'scope': 'string.interpolated.heredoc.puppet' },
+      'full interpolation with no spacing': { 'start': '@("EOT"/tsrnL$)', 'end': '|-EOT', 'scope': 'string.interpolated.heredoc.puppet' },
+      'full interpolation with much spacing': { 'start': '@(   "EOT"   /   tsrnL$   )', 'end': '|   -   EOT', 'scope': 'string.interpolated.heredoc.puppet' },
+    }
+    for (var contextName in contexts) {
+      context("with a " + contextName + " heredoc statement", function () {
+        var testCase = contexts[contextName];
+        var manifestTemplate = '$var = ##START##\n  value\n  ##END##\n$string = "value2"\n';
+        var manifest = manifestTemplate.replace('##START##', testCase['start']).replace('##END##', testCase['end']);
+        var hereDocScope = testCase['scope'];
+
+        it("tokenizes a " + contextName + " heredoc correctly", function () {
+          var tokens = getLineTokens(grammar, manifest);
+          //console.log(tokens);
+
+          // Ensure it starts
+          expect(tokens[3]).to.eql({ value: testCase["start"], scopes: ['source.puppet', hereDocScope, 'punctuation.definition.string.begin.puppet'] });
+          // // Ensure text within is part of the heredoc
+          expect(tokens[4]).to.eql({ value: "\n  value\n", scopes: ['source.puppet', hereDocScope] });
+          // Ensure it ends
+          expect(tokens[5]).to.eql({ value: "  " + testCase["end"], scopes: ['source.puppet', hereDocScope, 'punctuation.definition.string.end.puppet'] });
+          // Ensure text afterwards is not part of the heredoc
+          expect(tokens[8]).to.eql({ value: "string", scopes: ['source.puppet', 'variable.other.readwrite.global.puppet'] });
+        });
+      });
+    };
+
+    // TODO: Test heredoc with unicode escaping
+    // TODO: Test interpolation mode actually interpolates tokens
+    // TODO: Test adding syntax checking e.g. @(END:json)
+  });
+
   describe('numbers', function() {
     var hexTestCases = ['0xff', '0xabcdef0123456789', '0x0']
     var integerTestCases = ['10', '0', '-9', '10000']

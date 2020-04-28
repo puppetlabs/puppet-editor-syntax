@@ -383,7 +383,7 @@ repository:
         beginCaptures:
           '0':
             name: punctuation.definition.string.begin.puppet
-        end: '^[[:blank:]]*(\|-|\||-)?[[:blank:]]*\1'
+        end: '^[[:blank:]]*(\|[[:blank:]]*-|\||-)?[[:blank:]]*\1'
         endCaptures:
           '0':
             name: punctuation.definition.string.end.puppet
@@ -395,7 +395,7 @@ repository:
         beginCaptures:
           '0':
             name: punctuation.definition.string.begin.puppet
-        end: '^[[:blank:]]*(\|-|\||-)?[[:blank:]]*\1'
+        end: '^[[:blank:]]*(\|[[:blank:]]*-|\||-)?[[:blank:]]*\1'
         endCaptures:
           '0':
             name: punctuation.definition.string.end.puppet

@@ -1138,7 +1138,7 @@
             </dict>
           </dict>
           <key>end</key>
-          <string>^[[:blank:]]*(\|-|\||-)?[[:blank:]]*\1</string>
+          <string>^[[:blank:]]*(\|[[:blank:]]*-|\||-)?[[:blank:]]*\1</string>
           <key>endCaptures</key>
           <dict>
             <key>0</key>
@@ -1174,7 +1174,7 @@
             </dict>
           </dict>
           <key>end</key>
-          <string>^[[:blank:]]*(\|-|\||-)?[[:blank:]]*\1</string>
+          <string>^[[:blank:]]*(\|[[:blank:]]*-|\||-)?[[:blank:]]*\1</string>
           <key>endCaptures</key>
           <dict>
             <key>0</key>
