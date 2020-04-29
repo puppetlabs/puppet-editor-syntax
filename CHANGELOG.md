@@ -6,6 +6,12 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
 
+## [1.3.6] - 2020-05-01
+
+### Fixed
+
+- ([GH-58](https://github.com/puppetlabs/puppet-editor-syntax/issues/58)) Fix whitespace in heredoc tags
+
 ## [1.3.5] - 2019-03-26
 
 ### Fixed
