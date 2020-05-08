@@ -52,6 +52,16 @@ This project is cross platform, and can be developed using Mac, Linux or Windows
 
   `npm install --global --production windows-build-tools`
 
+### Using Gitpod
+
+If you're using [gitpod](https://gitpod.io), you can create a workspace using:
+
+`https://gitpod.io/#https://github.com/<Github Username>/puppet-editor-syntax/tree/<Git Branch>`
+
+To just browse master:
+
+[https://gitpod.io/#https://github.com/puppetlabs/puppet-editor-syntax](https://gitpod.io/#https://github.com/puppetlabs/puppet-editor-syntax)
+
 ### Running tests
 
 This project makes use of mocha and expect.js.  The tests are located in the `/tests` directory.
