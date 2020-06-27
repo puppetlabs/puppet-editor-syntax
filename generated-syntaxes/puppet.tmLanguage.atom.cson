@@ -113,6 +113,9 @@
         'name': 'keyword.control.puppet'
   }
   {
+    'include': '#keywords'
+  }
+  {
     'include': '#resource-definition'
   }
   {
@@ -515,6 +518,11 @@
         'include': '#single-quoted-string'
       }
     ]
+  'keywords':
+    'match': '\\b(undef)\\b'
+    'captures':
+      '1':
+        'name': 'keyword.puppet'
   'numbers':
     'patterns': [
       {

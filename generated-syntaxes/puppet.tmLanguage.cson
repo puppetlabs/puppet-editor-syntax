@@ -112,6 +112,9 @@ patterns: [
         name: "keyword.control.puppet"
   }
   {
+    include: "#keywords"
+  }
+  {
     include: "#resource-definition"
   }
   {
@@ -514,6 +517,11 @@ repository:
         include: "#single-quoted-string"
       }
     ]
+  keywords:
+    match: "\\b(undef)\\b"
+    captures:
+      "1":
+        name: "keyword.puppet"
   numbers:
     patterns: [
       {
