@@ -671,41 +671,61 @@ describe('puppet.tmLanguage', function() {
         });
       });
     };
+  });
 
-    var contexts = {
-      'node' : { 'manifest': 'node ##TESTCASE## { }', 'tokenIndex': 2, 'expectedScopes': ['meta.definition.class.puppet', 'entity.name.type.class.puppet'] },
-    }
-    for(var contextName in contexts) {
-      context("for a " + contextName, function() {
-        var contextManifest = contexts[contextName]['manifest'];
-        var tokenIndex = contexts[contextName]['tokenIndex'];
-        var scopesSuffix = contexts[contextName]['expectedScopes'];
+  describe('node names', function() {
+    it("tokenizes a single quoted name", function() {
+      var tokens = getLineTokens(grammar, "node 'foo' {\n  # something\n}");
+      expect(tokens[3]).to.eql({ value: 'foo', scopes: ['source.puppet', 'meta.definition.class.puppet', 'string.quoted.single.puppet'] });
+      // Ensure tokenisation isn't broken inside
+      expect(tokens[7]).to.eql({value: '#', scopes: ['source.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
+    });
 
-        var validTestCases = ['"foo"', "'foo'", "'foo2._local'", '"#{foo}"', "'foo\"'", '"foo\'"'];
-        var invalidTestCases = ['foo', "'foo\""];
+    it("tokenizes a single quoted name without interpolation", function() {
+      var tokens = getLineTokens(grammar, "node 'foo${bar}' {\n  # something\n}");
+      expect(tokens[3]).to.eql({ value: 'foo${bar}', scopes: ['source.puppet', 'meta.definition.class.puppet', 'string.quoted.single.puppet'] });
+      // Ensure tokenisation isn't broken inside
+      expect(tokens[7]).to.eql({value: '#', scopes: ['source.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
+    });
 
-        validTestCases.forEach(function(testCase){
-          it(testCase + " is a valid name", function() {
-            var manifest = contextManifest.replace('##TESTCASE##', testCase)
-            var tokens = getLineTokens(grammar, manifest);
+    it("tokenizes a double quoted name", function() {
+      var tokens = getLineTokens(grammar, "node \"foo\" {\n  # something\n}");
+      expect(tokens[3]).to.eql({ value: 'foo', scopes: ['source.puppet', 'meta.definition.class.puppet', 'string.quoted.double.interpolated.puppet'] });
+      // Ensure tokenisation isn't broken inside
+      expect(tokens[7]).to.eql({value: '#', scopes: ['source.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
+    });
 
-            expect(tokens[tokenIndex]).to.eql({value: testCase, scopes: ['source.puppet'].concat(scopesSuffix)});
-          });
-        });
+    it("tokenizes a double quoted name with interpolation", function() {
+      var tokens = getLineTokens(grammar, "node \"foo${bar}\" {\n  # something\n}");
+      expect(tokens[3]).to.eql({ value: 'foo', scopes: ['source.puppet', 'meta.definition.class.puppet', 'string.quoted.double.interpolated.puppet'] });
+      expect(tokens[5]).to.eql({ value: 'bar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'string.quoted.double.interpolated.puppet', "meta.embedded.line.puppet", "source.puppet", "variable.other.readwrite.global.puppet"] });
+      // Ensure tokenisation isn't broken inside
+      expect(tokens[10]).to.eql({value: '#', scopes: ['source.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
+    });
 
-        invalidTestCases.forEach(function(testCase){
-          it(testCase + " is not a valid name", function() {
-            var manifest = contextManifest.replace('##TESTCASE##', testCase)
-            var tokens = getLineTokens(grammar, manifest);
+    it("tokenizes a default name", function() {
+      var tokens = getLineTokens(grammar, "node default {\n  # something\n}");
+      expect(tokens[2]).to.eql({ value: 'default', scopes: ['source.puppet', 'meta.definition.class.puppet', 'keyword.puppet'] });
+      // Ensure tokenisation isn't broken inside
+      expect(tokens[5]).to.eql({value: '#', scopes: ['source.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
+    });
 
-            if (tokens[tokenIndex] == undefined) {
-              expect(tokens[tokenIndex]).to.be(undefined)
-            } else {
-              expect(tokens[tokenIndex]).to.not.eql({value: testCase, scopes: ['source.puppet'].concat(scopesSuffix)});
-            }
-          });
-        });
-      });
-    };
+    it("tokenizes a regular expression", function() {
+      var tokens = getLineTokens(grammar, "node /^(one|two)\\.example\\.com$/ {\n  # something\n}");
+      expect(tokens[2]).to.eql({ value: '/^(one|two)\\.example\\.com$/', scopes: ['source.puppet', 'meta.definition.class.puppet', 'string.regexp.literal.puppet'] });
+      // Ensure tokenisation isn't broken inside
+      expect(tokens[5]).to.eql({value: '#', scopes: ['source.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
+    });
+
+    it("tokenizes all possible names as a list", function() {
+      var tokens = getLineTokens(grammar, "node 'foo', \"bar\", default, /^www\\d+$/ {\n  # something\n}");
+      expect(tokens[3]).to.eql({ value: 'foo', scopes: ['source.puppet', 'meta.definition.class.puppet', 'string.quoted.single.puppet'] });
+      expect(tokens[7]).to.eql({ value: 'bar', scopes: ['source.puppet', 'meta.definition.class.puppet', 'string.quoted.double.interpolated.puppet'] });
+      expect(tokens[10]).to.eql({ value: 'default', scopes: ['source.puppet', 'meta.definition.class.puppet', 'keyword.puppet'] });
+      expect(tokens[12]).to.eql({ value: '/^www\\d+$/', scopes: ['source.puppet', 'meta.definition.class.puppet', 'string.regexp.literal.puppet'] });
+      // Ensure tokenisation isn't broken inside
+      expect(tokens[15]).to.eql({value: '#', scopes: ['source.puppet', 'comment.line.number-sign.puppet', 'punctuation.definition.comment.puppet']});
+    });
   });
 });
+

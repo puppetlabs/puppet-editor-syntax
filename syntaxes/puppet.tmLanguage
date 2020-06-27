@@ -32,10 +32,11 @@
       <key>name</key>
       <string>comment.block.puppet</string>
     </dict>
+
     <dict>
       <!-- node names are basically open to anything https://puppet.com/docs/puppet/6.4/lang_reserved.html#nodes -->
       <key>begin</key>
-      <string>\b(node)\s+(\"[^\"]+\"|\'[^\']+\')\s*</string>
+      <string>\b(node)\b</string>
       <key>captures</key>
       <dict>
         <key>1</key>
@@ -54,7 +55,22 @@
       <key>name</key>
       <string>meta.definition.class.puppet</string>
       <key>patterns</key>
-      <array />
+      <array>
+        <dict>
+          <key>match</key>
+          <string>\bdefault\b</string>
+          <key>name</key>
+          <string>keyword.puppet</string>
+        </dict>
+        <dict>
+          <key>include</key>
+          <string>#strings</string>
+        </dict>
+        <dict>
+          <key>include</key>
+          <string>#regex-literal</string>
+        </dict>
+      </array>
     </dict>
     <dict>
       <!-- Class names are specified as per https://puppet.com/docs/puppet/5.0/lang_reserved.html#classes-and-defined-resource-types -->

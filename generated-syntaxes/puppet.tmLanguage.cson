@@ -18,7 +18,7 @@ patterns: [
     name: "comment.block.puppet"
   }
   {
-    begin: "\\b(node)\\s+(\\\"[^\\\"]+\\\"|\\'[^\\']+\\')\\s*"
+    begin: "\\b(node)\\b"
     captures:
       "1":
         name: "storage.type.puppet"
@@ -26,7 +26,18 @@ patterns: [
         name: "entity.name.type.class.puppet"
     end: "(?={)"
     name: "meta.definition.class.puppet"
-    patterns: []
+    patterns: [
+      {
+        match: "\\bdefault\\b"
+        name: "keyword.puppet"
+      }
+      {
+        include: "#strings"
+      }
+      {
+        include: "#regex-literal"
+      }
+    ]
   }
   {
     begin: "\\b(class)\\s+((?#Qualified Resource Name)(?:[a-z][a-z0-9_]*)?(?:::[a-z][a-z0-9_]*)+|(?#Bareword Resource Name)[a-z][a-z0-9_]*)\\s*"
