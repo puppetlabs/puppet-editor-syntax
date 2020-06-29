@@ -18,7 +18,7 @@
     'name': 'comment.block.puppet'
   }
   {
-    'begin': '\\b(node)\\s+(\\"[^\\"]+\\"|\'[^\']+\')\\s*'
+    'begin': '\\b(node)\\b'
     'captures':
       '1':
         'name': 'storage.type.puppet'
@@ -27,6 +27,16 @@
     'end': '(?={)'
     'name': 'meta.definition.class.puppet'
     'patterns': [
+      {
+        'match': '\\bdefault\\b'
+        'name': 'keyword.puppet'
+      }
+      {
+        'include': '#strings'
+      }
+      {
+        'include': '#regex-literal'
+      }
     ]
   }
   {
