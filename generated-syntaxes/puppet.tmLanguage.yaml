@@ -68,6 +68,7 @@ patterns:
     captures:
       '1':
         name: keyword.control.puppet
+  - include: '#keywords'
   - include: '#resource-definition'
   - include: '#heredoc'
   - include: '#strings'
@@ -321,6 +322,11 @@ repository:
     patterns:
       - include: '#double-quoted-string'
       - include: '#single-quoted-string'
+  keywords:
+    match: \b(undef)\b
+    captures:
+      '1':
+        name: keyword.puppet
   numbers:
     patterns:
       - comment: HEX 0x 0-f

@@ -206,6 +206,10 @@
     </dict>
     <dict>
       <key>include</key>
+      <string>#keywords</string>
+    </dict>
+    <dict>
+      <key>include</key>
       <string>#resource-definition</string>
     </dict>
     <dict>
@@ -947,6 +951,21 @@
         </dict>
       </array>
     </dict>
+
+    <key>keywords</key>
+    <dict>
+      <key>match</key>
+      <string>\b(undef)\b</string>
+      <key>captures</key>
+      <dict>
+        <key>1</key>
+        <dict>
+          <key>name</key>
+          <string>keyword.puppet</string>
+        </dict>
+      </dict>
+    </dict>
+
     <!-- Ref https://github.com/puppetlabs/puppet-specifications/blob/master/language/lexical_structure.md#numbers -->
     <key>numbers</key>
     <dict>

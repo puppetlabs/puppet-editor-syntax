@@ -708,4 +708,12 @@ describe('puppet.tmLanguage', function() {
       });
     };
   });
+
+  describe('keywords', function() {
+    it("tokenizes undef", function() {
+      var tokens = getLineTokens(grammar, 'if $var != undef { }');
+      expect(tokens[5]).to.eql({value: 'undef', scopes: ['source.puppet', 'keyword.puppet']});
+    });
+
+  });
 });
