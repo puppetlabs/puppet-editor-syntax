@@ -6,6 +6,13 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## Unreleased
 
+## [1.3.7] - 2020-07-10
+
+### Fixed
+
+- ([GH-66](https://github.com/puppetlabs/puppet-editor-syntax/issues/66)) undef is not treated as a special value
+- ([GH-65](https://github.com/puppetlabs/puppet-editor-syntax/issues/65)) Tokenise Node names correctly
+
 ## [1.3.6] - 2020-05-01
 
 ### Fixed
