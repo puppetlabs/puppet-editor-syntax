@@ -16,7 +16,7 @@
   "license": "MIT",
   "devDependencies": {
     "expect.js": "^0.3.1",
-    "mocha": "^7.0.2",
+    "mocha": "^10.2.0",
     "vscode-textmate": "^3.2.0",
     "js-yaml": "^3.13.1",
     "md5": "^2.2.1",
